@@ -9,6 +9,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
   <title>Kosol Energie Pvt Ltd - Sales Team Management System</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -1593,7 +1595,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         <div class="col-12 col-md-6"><label class="form-label small fw-bold">Organization / Client Search *</label><div class="client-search-anchor position-relative"><div class="input-group input-group-sm"><input type="search" class="form-control" id="cOrgName" required autocomplete="off" placeholder="Search organization/contact or type new organization"><button class="btn btn-outline-secondary" type="button" onclick="clearSelectedClient()" title="Clear selection"><i class="bi bi-x-lg"></i></button></div><div id="clientOrgOptions" class="search-option-list client-org-dropdown" role="listbox" aria-label="Existing client or organization suggestions"></div></div><small id="clientSelectionCaption" class="text-success d-none"></small></div>
         <div class="col-12 col-md-4"><label class="form-label small fw-bold">Client Mobile *</label><div class="input-group input-group-sm"><input type="tel" class="form-control" id="cMobile" required inputmode="tel" autocomplete="tel"><button class="btn btn-outline-secondary" type="button" onclick="pickPhoneFor('cMobile')"><i class="bi bi-person-lines-fill"></i></button></div><small class="text-muted">Manual entry or device contacts.</small></div>
         <div class="col-12 col-md-2"><label class="form-label small fw-bold">Contact Person *</label><input type="text" class="form-control form-control-sm" id="cContactName" required></div>
-        <div class="col-6 col-md-3"><label class="form-label small">Office Phone</label><div class="input-group input-group-sm"><input type="tel" class="form-control" id="cOfficeMobile"><button type="button" class="btn btn-outline-secondary" onclick="pickPhoneFor('cOfficeMobile')"><i class="bi bi-person-lines-fill"></i></button></div></div><div class="col-6 col-md-3"><label class="form-label small">Email</label><input type="email" class="form-control form-control-sm" id="cEmail"></div><div class="col-12 col-md-2"><label class="form-label small">GSTIN</label><input type="text" class="form-control form-control-sm" id="cGstin"></div>
+        <div class="col-6 col-md-3"><label class="form-label small">Office Phone</label><div class="input-group input-group-sm"><input type="tel" class="form-control" id="cOfficeMobile"><button type="button" class="btn btn-outline-secondary" onclick="pickPhoneFor('cOfficeMobile')"><i class="bi bi-person-lines-fill"></i></button></div></div><div class="col-6 col-md-3"><label class="form-label small">Email</label><input type="email" class="form-control form-control-sm" id="cEmail" name="clientContactEmail" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div><div class="col-12 col-md-2"><label class="form-label small">GSTIN</label><input type="text" class="form-control form-control-sm" id="cGstin"></div>
         <div class="col-6 col-md-2"><label class="form-label small fw-bold">State *</label><select multiple size="3" class="form-select form-select-sm" id="cState" required></select></div><div class="col-6 col-md-2"><label class="form-label small fw-bold">Region *</label><select multiple size="3" class="form-select form-select-sm" id="cRegion" required></select><input class="form-control form-control-sm mt-1 d-none" id="cRegionManual" placeholder="Type region"></div>
         <div class="col-6 col-md-2"><label class="form-label small fw-bold">District *</label><input class="form-control form-control-sm" id="cDistrict" list="cDistrictList" placeholder="Type or select district" required><datalist id="cDistrictList"></datalist></div><div class="col-6 col-md-2"><label class="form-label small">Tehsil / Taluka</label><input class="form-control form-control-sm" id="cTehsil" list="cTehsilList" placeholder="Type or select tehsil / taluka"><datalist id="cTehsilList"></datalist></div>
         <div class="col-12 col-md-3"><label class="form-label small fw-bold">City / Village *</label><input class="form-control form-control-sm" id="cCityVillage" list="cCityVillageList" placeholder="Type or select city / village" required><datalist id="cCityVillageList"></datalist></div><div class="col-12 col-md-2"><label class="form-label small">PIN Code</label><input type="text" class="form-control form-control-sm" id="cPinCode" inputmode="numeric" maxlength="6" list="cPinCodeList" placeholder="Type or select 6 digit PIN"><datalist id="cPinCodeList"></datalist></div>
@@ -1636,7 +1638,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       <div class="col-12"><div id="coldCallLinkedPanel" class="call-sync-panel d-none"></div></div>
         <div class="col-12 col-md-6"><label class="form-label small fw-bold">Organization / Client Search *</label><div class="input-group input-group-sm"><input type="search" class="form-control" id="ccSearchOrg" required autocomplete="off" placeholder="Search organization, contact or mobile"><button type="button" class="btn btn-outline-secondary" onclick="clearColdCallClientSelection()"><i class="bi bi-x-lg"></i></button></div><div id="ccClientOptions" class="search-option-list position-static mt-1"></div><small id="ccSelectionCaption" class="text-success d-none"></small></div>
         <div class="col-12 col-md-4"><label class="form-label small fw-bold">Client Mobile *</label><div class="input-group input-group-sm"><input type="tel" class="form-control" id="ccPhone" required inputmode="tel"><button class="btn btn-outline-secondary" type="button" onclick="pickPhoneFor('ccPhone')"><i class="bi bi-person-lines-fill"></i></button></div><small class="text-muted">Select from device contacts or type manually.</small></div><div class="col-12 col-md-2"><label class="form-label small fw-bold">Contact Person *</label><input type="text" class="form-control form-control-sm" id="ccContactName" required></div>
-        <input type="hidden" id="ccOrgName"><div class="col-6 col-md-3"><label class="form-label small">Office Phone</label><div class="input-group input-group-sm"><input type="tel" class="form-control" id="ccOfficePhone"><button type="button" class="btn btn-outline-secondary" onclick="pickPhoneFor('ccOfficePhone')"><i class="bi bi-person-lines-fill"></i></button></div></div><div class="col-6 col-md-3"><label class="form-label small">Email</label><input type="email" class="form-control form-control-sm" id="ccEmail"></div><div class="col-6 col-md-3"><label class="form-label small">State</label><select multiple size="3" class="form-select form-select-sm" id="ccState"></select></div>
+        <input type="hidden" id="ccOrgName"><div class="col-6 col-md-3"><label class="form-label small">Office Phone</label><div class="input-group input-group-sm"><input type="tel" class="form-control" id="ccOfficePhone"><button type="button" class="btn btn-outline-secondary" onclick="pickPhoneFor('ccOfficePhone')"><i class="bi bi-person-lines-fill"></i></button></div></div><div class="col-6 col-md-3"><label class="form-label small">Email</label><input type="email" class="form-control form-control-sm" id="ccEmail" name="coldCallClientEmail" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div><div class="col-6 col-md-3"><label class="form-label small">State</label><select multiple size="3" class="form-select form-select-sm" id="ccState"></select></div>
         <div class="col-6 col-md-2"><label class="form-label small">Region</label><select multiple size="3" class="form-select form-select-sm" id="ccRegion"></select><input class="form-control form-control-sm mt-1 d-none" id="ccRegionManual" placeholder="Type region"></div><div class="col-6 col-md-2"><label class="form-label small">District</label><input class="form-control form-control-sm" id="ccDistrict" list="ccDistrictList" placeholder="Type or select district"><datalist id="ccDistrictList"></datalist></div><div class="col-6 col-md-2"><label class="form-label small">Tehsil / Taluka</label><input class="form-control form-control-sm" id="ccTehsil" list="ccTehsilList" placeholder="Type or select tehsil / taluka"><datalist id="ccTehsilList"></datalist></div><div class="col-12 col-md-3"><label class="form-label small">City / Village</label><input class="form-control form-control-sm" id="ccCityVillage" list="ccCityVillageList" placeholder="Type or select city / village"><datalist id="ccCityVillageList"></datalist></div>
         <div class="col-6 col-md-2"><label class="form-label small">PIN Code</label><input type="text" class="form-control form-control-sm" id="ccPinCode" inputmode="numeric" maxlength="6" list="ccPinCodeList" placeholder="Type or select 6 digit PIN"><datalist id="ccPinCodeList"></datalist></div>
       </div>
@@ -1744,6 +1746,20 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
   const DATA_REFRESH_INTERVAL_MS = 60000; // 60 seconds while visible; module opens still refresh immediately
   let lastDataFingerprint = '';
   let welcomeShownThisSession = false;
+  // Auto-sync state (background polling, write-triggered refresh, cross-tab notification).
+  let pollUnchangedCount = 0;      // consecutive background polls that returned identical data
+  let pollFailureCount = 0;        // consecutive background poll failures (drives back-off)
+  let lastRefreshStartedAt = 0;
+  let refreshQueuedOptions = null; // a user/save refresh requested while another one was running
+  let refreshWaiters = [];
+  let lastTeamSignature = '';
+  let lastSnapshotSavedAt = 0;
+  const BACKGROUND_REFRESH_REASONS = new Set(['auto-poll','tab-visible','pageshow','cross-tab','online','focus']);
+  const FRESH_FETCH_REASONS = new Set(['auto-poll','cross-tab','online','focus']);
+  const POLL_BASE_MS = 30000;      // check for changes every 30s while the tab is visible
+  const POLL_IDLE_MS = 60000;      // slow down after several unchanged checks
+  const POLL_MAX_MS = 180000;      // back-off ceiling after failures
+  function quickHash(s){let h=5381,i=s.length;while(i)h=(h*33)^s.charCodeAt(--i);return (h>>>0).toString(36)+':'+s.length;}
 
   // Fast-start cache: show the last authenticated user's snapshot immediately,
   // then replace it atomically with the fresh backend snapshot in the background.
@@ -1791,9 +1807,10 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
   }
 
   function getFormattedUserRoleDisplay(u) {
-    const stateStr = u.states ? u.states.join(', ') : '';
-    const regionStr = u.regions ? u.regions.join(', ') : '';
-    const districtStr = u.districts ? u.districts.join(', ') : '';
+    const _j=v=>Array.isArray(v)?v.filter(x=>x!==null&&x!==undefined&&String(x).trim()!=='').join(', '):String(v??'');
+    const stateStr = _j(u.states);
+    const regionStr = _j(u.regions);
+    const districtStr = _j(u.districts);
 
     if (u.role === "Master Admin") return "Master Admin - Global / All India";
     if (u.role === "National Head") return "National Head (CEO) - India";
@@ -2024,8 +2041,18 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
   function showDataSyncStatus(state,message){const ids=['dashboardSyncState','clientSyncState','salesSyncState'];ids.forEach(id=>{const e=document.getElementById(id);if(e){e.className='dashboard-sync-state '+state;e.innerHTML=state==='synced'?'<i class="bi bi-cloud-check"></i> Backend synchronized':state==='pending'?'<i class="bi bi-arrow-repeat"></i> Synchronizing…':'<i class="bi bi-exclamation-triangle"></i> Sync failed';e.title=message||'';}})}
   async function refreshData(options={}) {
     if(!currentUser) return false;
-    if(dataRefreshInFlight) return false;
+    const isBackground=BACKGROUND_REFRESH_REASONS.has(options.reason);
+    if(dataRefreshInFlight){
+      // Background checks can simply be skipped. A user action / save must never be dropped:
+      // it is re-run as soon as the running request completes so the screen shows the newest data.
+      if(isBackground) return false;
+      return new Promise(resolve=>{
+        refreshWaiters.push(resolve);
+        refreshQueuedOptions=Object.assign({},options,{force:true});
+      });
+    }
     dataRefreshInFlight=true;
+    lastRefreshStartedAt=Date.now();
     const silent=options.silent!==false;
     try{
       if(options.force===true) invalidateBackendReadCache();
@@ -2036,9 +2063,10 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         districts:currentUser.districts||[],tehsils:currentUser.tehsils||[],cities:currentUser.cities||[],
         pinCodes:currentUser.pinCodes||[],reportingManagers:currentUser.reportingManagers||[]
       };
-      const res=await callBackendFast('getDashboardData',dashboardPayload);
+      const res=await callBackendFast('getDashboardData',dashboardPayload,{fresh:FRESH_FETCH_REASONS.has(options.reason)});
       const payload=(res && res.data && typeof res.data==='object') ? res.data : res;
       if(!res || res.success===false || !payload){
+        if(options.reason==='auto-poll') pollFailureCount++;
         if(!silent) showOperationMessage('Dashboard refresh failed',res?.message||payload?.message||'Unable to load dashboard data.','error');
         return false;
       }
@@ -2050,44 +2078,60 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       rawData.coldCalls=Array.isArray(res.coldCalls)?res.coldCalls:[];
       rawData.salesOrders=Array.isArray(res.salesOrders)?res.salesOrders:loadLocalSalesOrders();
       rawData.targets=Array.isArray(res.targets)?res.targets:[];
-      const previousUnreadNotifications=(rawData.notifications||[]).filter(x=>!x.read).length;
       rawData.notifications=Array.isArray(res.notifications)?res.notifications:[];
-      const currentUnreadNotifications=rawData.notifications.filter(x=>!x.read).length;
-      if(currentUnreadNotifications>previousUnreadNotifications) notificationBadgeDismissed=false;
-      renderNotificationBadge();
       rawData.approvals=Array.isArray(res.approvals)?res.approvals:[];
       rawData.todayAttendance=res.todayAttendance||null;
       rawData.teamUsers=Array.isArray(res.teamUsers)?res.teamUsers:[];
       allUsersList=rawData.teamUsers.slice();
-      try{refreshReportingManagerSelectors();}catch(e){}
-      const fingerprint=JSON.stringify([
-        rawData.clients.map(x=>[x.id,x.activityDate,x.visitCount,x.callStatus,x.visitStatus,x.meetingStatus]),
-        rawData.coldCalls.map(x=>[x.id,x.entryDate,x.visitCount,x.outcome,x.callStatus]),
-        rawData.salesOrders.map(x=>[x.id,x.date,x.repeatCount,x.amount,x.kw,x.lpd]),
-        rawData.targets.map(x=>[x.id,x.date,x.amount,x.target]),
-        rawData.notifications.map(x=>[x.id,x.read,x.timestamp])
-      ]);
+      // Records saved earlier with the logged-in user's e-mail as the "client e-mail" are shown blank.
+      // Only done when another owner field exists, so ownership matching is unaffected.
+      try{
+        const sysEmails=systemUserEmailSet();
+        const fix=r=>{
+          if(!r||!r.email) return;
+          if(!sysEmails.has(String(r.email).trim().toLowerCase())) return;
+          if(r.userId||r.userEmail||r.createdBy||r.ownerEmail||r.createdByUserId||r.ownerId) r.email='';
+        };
+        rawData.clients.forEach(fix); rawData.coldCalls.forEach(fix);
+      }catch(e){}
+      const teamSignature=quickHash(JSON.stringify(rawData.teamUsers.map(u=>[u&&u.id,u&&u.name,u&&u.role,u&&u.status])));
+      if(!isBackground || teamSignature!==lastTeamSignature){ try{refreshReportingManagerSelectors();}catch(e){} }
+      lastTeamSignature=teamSignature;
+      // Fingerprint covers every record field of every module (tasks and approvals included),
+      // so any edit made by any user is detected and re-rendered without a manual page refresh.
+      const fingerprint=quickHash(JSON.stringify([
+        rawData.clients,rawData.tasks,rawData.coldCalls,rawData.approvals,rawData.salesOrders,
+        rawData.targets,rawData.notifications,rawData.todayAttendance
+      ]));
       const dataChanged=fingerprint!==lastDataFingerprint;
       lastDataFingerprint=fingerprint;
+      if(options.reason==='auto-poll'){ pollFailureCount=0; pollUnchangedCount=dataChanged?0:pollUnchangedCount+1; }
+      else if(dataChanged){ pollUnchangedCount=0; }
       dashboardStatsCacheKey='';
       dashboardStatsCacheValue=null;
       salesOrderRepeatMapCacheKey='';
       salesOrderRepeatMapCache=new Map();
-      saveDashboardSnapshotCache();
+      // Serialising the whole snapshot is expensive: only do it when something changed
+      // (or every 5 minutes to keep the fast-start cache timestamp fresh).
+      if(dataChanged || Date.now()-lastSnapshotSavedAt>300000){ saveDashboardSnapshotCache(); lastSnapshotSavedAt=Date.now(); }
+      const shouldRender=!isBackground || dataChanged || !lastSuccessfulDataRefresh;
+      // Notifications for every module (follow-ups, tasks, approvals, sales orders, targets, attendance)
+      // are recalculated from the fresh snapshot; the bell badge updates automatically.
+      try{ syncNotificationBadgeAfterRefresh(); }catch(e){ console.warn('Notification sync skipped:',e); }
 
       evaluateAttendanceWindowState();
       // Render the dashboard plus only the currently visible module. Hidden large
       // tables/boards no longer rebuild every polling cycle.
       if(dataChanged || options.reason==='module-open' || !lastSuccessfulDataRefresh) applyDashboardFilters();
       switch(activeTabId){
-        case 'clients': renderClients(); break;
-        case 'tasks': renderTasks(); break;
-        case 'approvals': renderApprovals(); break;
-        case 'coldcalls': renderColdCalls(); break;
-        case 'salesorders': renderSalesOrders(); break;
-        case 'targets': renderTargetModule(); break;
+        case 'clients': if(shouldRender) renderClients(); break;
+        case 'tasks': if(shouldRender) renderTasks(); break;
+        case 'approvals': if(shouldRender) renderApprovals(); break;
+        case 'coldcalls': if(shouldRender) renderColdCalls(); break;
+        case 'salesorders': if(shouldRender) renderSalesOrders(); break;
+        case 'targets': if(shouldRender) renderTargetModule(); break;
         case 'pipelineleads':
-        case 'pipelineorders': renderPipelineBoards(); break;
+        case 'pipelineorders': if(shouldRender) renderPipelineBoards(); break;
         case 'attendance': await fetchAttendanceApprovals(); break;
         case 'hierarchy': await fetchAndRenderTree(); break;
         case 'users': await fetchPendingUsers(); await fetchAndRenderTree(); break;
@@ -2098,10 +2142,16 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       return true;
     }catch(err){
       console.error('refreshData failed:',err);
+      if(options.reason==='auto-poll') pollFailureCount++;
       if(!silent) showOperationMessage('Data refresh failed',err.message||String(err),'error');
       return false;
     }finally{
       dataRefreshInFlight=false;
+      if(refreshQueuedOptions){
+        const queued=refreshQueuedOptions, waiters=refreshWaiters;
+        refreshQueuedOptions=null; refreshWaiters=[];
+        refreshData(queued).then(ok=>waiters.forEach(w=>w(ok)),()=>waiters.forEach(w=>w(false)));
+      }
     }
   }
 
@@ -2116,25 +2166,61 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     }
   }
 
-  function startLiveDataSync(){
-    // Load the complete snapshot once after login/page initialization.
-    // Do not poll automatically: subsequent backend refreshes happen only through
-    // explicit user actions (Refresh, applicable filters, module opening, or saves).
+  function nextPollDelay(){
+    const base=pollUnchangedCount>=4?POLL_IDLE_MS:POLL_BASE_MS;
+    return Math.min(base*Math.pow(2,Math.min(pollFailureCount,3)),POLL_MAX_MS);
+  }
+  function scheduleNextPoll(){
+    if(dataRefreshTimer){clearTimeout(dataRefreshTimer);dataRefreshTimer=null;}
+    if(!currentUser || document.visibilityState!=='visible') return;
+    dataRefreshTimer=setTimeout(async()=>{
+      dataRefreshTimer=null;
+      if(!currentUser || document.visibilityState!=='visible') return;
+      // Never refresh underneath an open form/modal, and never poll while offline.
+      const modalOpen=!!document.querySelector('.modal.show');
+      if(navigator.onLine!==false && !modalOpen){
+        try{ await refreshData({silent:true,reason:'auto-poll'}); }catch(e){}
+      }
+      scheduleNextPoll();
+    },nextPollDelay());
+  }
+
+  function startLiveDataSync(opts){
+    // Load the snapshot immediately, then keep it current in the background while the tab is
+    // visible: changes made by any user (or in another tab/device) appear automatically.
     stopLiveDataSync();
     if(!currentUser) return;
-    refreshData({silent:true,reason:'initial-load',force:false});
+    pollUnchangedCount=0; pollFailureCount=0;
+    if(!opts || opts.immediate!==false) refreshData({silent:true,reason:'initial-load',force:false});
+    scheduleNextPoll();
   }
 
   function stopLiveDataSync(){
     if(dataRefreshTimer){
-      clearInterval(dataRefreshTimer);
+      clearTimeout(dataRefreshTimer);
       dataRefreshTimer=null;
     }
   }
 
+  window.addEventListener('online',()=>{ if(currentUser) refreshData({silent:true,reason:'online'}); });
+  window.addEventListener('focus',()=>{
+    if(currentUser && document.visibilityState==='visible' && Date.now()-lastSuccessfulDataRefresh>20000) refreshData({silent:true,reason:'focus'});
+  });
+
+  // Cross-tab notification: a save in one tab refreshes every other open tab immediately.
+  let dataSyncChannel=null;
+  try{ if('BroadcastChannel' in window){ dataSyncChannel=new BroadcastChannel('kosol-data-sync'); } }catch(e){ dataSyncChannel=null; }
+  if(dataSyncChannel){
+    dataSyncChannel.onmessage=function(ev){
+      if(!currentUser || !ev || !ev.data || ev.data.type!=='data-changed') return;
+      invalidateBackendReadCache();
+      refreshData({silent:true,reason:'cross-tab'});
+    };
+  }
+
   document.addEventListener('visibilitychange',()=>{
-    // Visibility changes do not trigger backend calls. This prevents unnecessary
-    // reloads and preserves the fast, user-controlled refresh strategy.
+    // Polling only runs while the tab is visible; the visible-handler further below
+    // restarts it and refreshes immediately when the user comes back.
     if(document.visibilityState!=='visible') stopLiveDataSync();
   });
 
@@ -2352,11 +2438,11 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       const iconId = `userIcon_${index}`;
       tbody.innerHTML += `
         <tr>
-          <td><span class="badge bg-secondary">${u.states.join(', ') || 'Global'}</span></td>
+          <td><span class="badge bg-secondary">${escapeHtml((Array.isArray(u.states)?u.states:[]).filter(Boolean).join(', ') || 'Global')}</span></td>
           <td><small class="fw-bold">${getFormattedUserRoleDisplay(u)}</small></td>
-          <td class="fw-bold">${u.name}</td>
-          <td><small>${u.email}</small></td>
-          <td><small>${u.phone}</small></td>
+          <td class="fw-bold">${escapeHtml(u.name)}</td>
+          <td><small>${escapeHtml(u.email)}</small></td>
+          <td><small>${escapeHtml(u.phone)}</small></td>
           <td><small>${escapeHtml((u.reportingManagers||u.reportingTo||[]).join(', ')||'Not assigned')}</small></td>
           <td><span class="badge ${String(u.status||'').toLowerCase()==='active'?'bg-success':String(u.status||'').toLowerCase()==='pending'?'bg-warning text-dark':'bg-secondary'}">${escapeHtml(u.status||'')}</span></td>
           <td>
@@ -2485,11 +2571,11 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       res.pending.forEach(item => {
         tbody.innerHTML += `
           <tr>
-            <td><small class="fw-bold">${item.id}</small></td>
-            <td class="fw-bold">${item.email}</td>
-            <td><small>${item.timestamp}</small></td>
-            <td><small>${item.explanation}</small></td>
-            <td><span class="badge bg-warning text-dark">${item.status}</span></td>
+            <td><small class="fw-bold">${escapeHtml(item.id)}</small></td>
+            <td class="fw-bold">${escapeHtml(item.email)}</td>
+            <td><small>${escapeHtml(item.timestamp)}</small></td>
+            <td><small>${escapeHtml(item.explanation)}</small></td>
+            <td><span class="badge bg-warning text-dark">${escapeHtml(item.status)}</span></td>
             <td>
               ${isMasterAdmin ? `
                 <button class="btn btn-sm btn-primary me-1" onclick="processAttendanceApproval('${item.id}', true)"><i class="bi bi-check-lg"></i> Approve</button>
@@ -2594,11 +2680,11 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         chatBox.innerHTML += `
           <div class="chat-bubble ${bubbleClass}">
             <div class="d-flex justify-content-between align-items-center mb-1">
-              <small class="fw-bold">${msg.sender}</small>
-              <small class="text-muted extra-small ms-2">${msg.timestamp}</small>
+              <small class="fw-bold">${escapeHtml(msg.sender)}</small>
+              <small class="text-muted extra-small ms-2">${escapeHtml(msg.timestamp)}</small>
             </div>
-            <div class="small">${msg.message}</div>
-            ${msg.type !== 'COMMENT' ? `<span class="badge bg-secondary extra-small mt-1">${msg.type}</span>` : ''}
+            <div class="small">${escapeHtml(msg.message)}</div>
+            ${msg.type !== 'COMMENT' ? `<span class="badge bg-secondary extra-small mt-1">${escapeHtml(msg.type)}</span>` : ''}
           </div>
         `;
       });
@@ -2629,12 +2715,12 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       const badgeClass = t.status === 'DONE' ? 'bg-success' : t.status === 'IN PROGRESS' ? 'bg-warning text-dark' : t.status === 'REVERTED' ? 'bg-danger' : 'bg-primary';
       tbody.innerHTML += `
         <tr>
-          <td><small class="fw-bold">${t.id}</small></td>
-          <td class="fw-bold">${t.title}</td>
-          <td><small>${t.assignedBy}</small></td>
-          <td><small class="fw-bold">${t.assignedTo}</small></td>
-          <td><small class="text-primary fw-bold">${t.followUpDate}</small></td>
-          <td><span class="badge ${badgeClass}">${t.status}</span></td>
+          <td><small class="fw-bold">${escapeHtml(t.id)}</small></td>
+          <td class="fw-bold">${escapeHtml(t.title)}</td>
+          <td><small>${escapeHtml(t.assignedBy)}</small></td>
+          <td><small class="fw-bold">${escapeHtml(t.assignedTo)}</small></td>
+          <td><small class="text-primary fw-bold">${escapeHtml(t.followUpDate)}</small></td>
+          <td><span class="badge ${badgeClass}">${escapeHtml(t.status)}</span></td>
           <td>
             <button class="btn btn-sm btn-outline-dark" onclick="openTaskConversation('${t.id}', '${t.title}')">
               <i class="bi bi-chat-left-dots-fill text-primary me-1"></i> View Thread
@@ -2718,12 +2804,12 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
 
       tbody.innerHTML += `
         <tr>
-          <td><small class="fw-bold">${a.id}</small></td>
-          <td>${a.requestedByName}<br><small class="text-muted">${a.requestedByRole}</small></td>
-          <td><span class="badge bg-secondary">${a.targetApproverRole}</span></td>
-          <td class="fw-bold">${a.category}</td>
-          <td><small>${a.details}</small></td>
-          <td><span class="badge ${badgeClass}">${a.status}</span></td>
+          <td><small class="fw-bold">${escapeHtml(a.id)}</small></td>
+          <td>${escapeHtml(a.requestedByName)}<br><small class="text-muted">${escapeHtml(a.requestedByRole)}</small></td>
+          <td><span class="badge bg-secondary">${escapeHtml(a.targetApproverRole)}</span></td>
+          <td class="fw-bold">${escapeHtml(a.category)}</td>
+          <td><small>${escapeHtml(a.details)}</small></td>
+          <td><span class="badge ${badgeClass}">${escapeHtml(a.status)}</span></td>
           <td>
             ${a.status === 'PENDING' && isTargetApprover ? `
               <button class="btn btn-sm btn-success me-1" onclick="processGeneralApproval('${a.id}', true)"><i class="bi bi-check-lg"></i></button>
@@ -2750,7 +2836,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     const select = document.getElementById('taskAssignedToSelect');
     select.innerHTML = '<option value="">-- Select Team Member --</option>';
     allUsersList.forEach(u => {
-      select.innerHTML += `<option value="${u.email}">${u.name} (${getFormattedUserRoleDisplay(u)})</option>`;
+      select.innerHTML += `<option value="${escapeAttr(u.email)}">${escapeHtml(u.name)} (${escapeHtml(getFormattedUserRoleDisplay(u))})</option>`;
     });
     document.getElementById('taskFollowUpDate').value = appToday();
     new bootstrap.Modal(document.getElementById('taskModal')).show();
@@ -2893,7 +2979,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       contactName: document.getElementById('ccContactName').value,
       phone: document.getElementById('ccPhone').value,
       officePhone: document.getElementById('ccOfficePhone').value,
-      email: document.getElementById('ccEmail').value,
+      email: clientEmailClean(document.getElementById('ccEmail').value),
       state: getSelectOrOther('ccState'), region: getSelectOrOther('ccRegion'), district: getSelectOrOther('ccDistrict'),
       tehsil: getSelectOrOther('ccTehsil'), city: getSelectOrOther('ccCityVillage'),
       visitType: getSelectOrOther('ccVisitType'), visitCount: computedCallCount,
@@ -3175,6 +3261,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     document.getElementById('cSelectedClientId').value = '';
     document.getElementById('clientForm').reset();
     document.getElementById('cEntryDate').value = appToday();
+    try{ delete document.getElementById('cEntryDate').dataset.userEdited; }catch(_){}
     document.getElementById('cVisitCount').value = 1;
     const orgBox=document.getElementById('clientOrgOptions'); if(orgBox) orgBox.classList.remove('show');
     document.getElementById('cLocationPreview').style.display='none'; pendingLocationImageFile=null; document.getElementById('cLocationGallery').value=''; document.getElementById('cLocationCamera').value='';
@@ -3317,13 +3404,31 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     setValue('cVisitStatus', c.visitStatus || 'Not Done'); setValue('cMeetingStatus', c.meetingStatus || 'Not Done');
     setValue('cCallStatus', c.callStatus || ''); setValue('cRequirements', c.requirements || '');
     setValue('cRemarks', c.remarks || ''); setValue('cPinCode', c.pinCode ? String(c.pinCode).split(' | ') : []); setValue('cPinManual',''); setValue('cAddress', c.address || '');
-    if(c.entryDate) setValue('cEntryDate', toInputDate(c.entryDate));
+    // Editing an existing record keeps that record's own date. Loading an EXISTING client/organization
+    // for a NEW visit must always use today's date - never the date of the previous entry.
+    if(editMode){ if(c.entryDate) setValue('cEntryDate', toInputDate(c.entryDate)); }
+    else setValue('cEntryDate', appToday());
+    try{ delete document.getElementById('cEntryDate').dataset.userEdited; }catch(_){}
     if(!editMode) document.getElementById('cVisitCount').value = 1;
     renderClientCallSync(c);
     refreshClientIdentityAutomation();
     renderClientSalesOrderPanel();
     updateClientSalesOrderFields();
   }
+
+  ['input','change'].forEach(evt=>document.getElementById('cEntryDate')?.addEventListener(evt,ev=>{
+    if(ev.isTrusted) ev.target.dataset.userEdited='1';
+  }));
+
+  // Browser autofill may drop the login e-mail into the client e-mail box: clear it whenever the form opens.
+  function clearAutofilledClientEmail(id){
+    const el=document.getElementById(id); if(!el||!el.value) return;
+    if(String(el.value).trim().toLowerCase()===String(currentUser?.email||'').trim().toLowerCase()) el.value='';
+  }
+  ['clientModal:cEmail','coldCallModal:ccEmail'].forEach(pair=>{
+    const [mid,fid]=pair.split(':'); const m=document.getElementById(mid); if(!m) return;
+    m.addEventListener('shown.bs.modal',()=>{[0,300,1200].forEach(ms=>setTimeout(()=>clearAutofilledClientEmail(fid),ms));});
+  });
 
   function incrementVisitCount() {
     const el=document.getElementById('cVisitCount'); el.value=Math.max(1,Number(el.value||1)+1);
@@ -3455,6 +3560,12 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       }
 
       const selectedExistingId=String(document.getElementById('cSelectedClientId')?.value||'').trim();
+      // Automatic date update: a new visit/entry (including one linked to an existing client) is dated
+      // today unless the user deliberately picked a different date in the date field.
+      if(!editingClientId){
+        const entryDateEl=document.getElementById('cEntryDate');
+        if(entryDateEl && entryDateEl.dataset.userEdited!=='1') entryDateEl.value=appToday();
+      }
       let computedVisitCount=Math.max(1,Number(getVal('cVisitCount')||1));
       if(!editingClientId){
         const org=String(getVal('cOrgName')||'').trim().toLowerCase();
@@ -3469,7 +3580,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         ownerEmail:editingClientId?(existingClientRecord?.userEmail||existingClientRecord?.createdBy||existingClientRecord?.ownerEmail||currentUser.email):currentUser.email,
         createdByUserId:editingClientId?(existingClientRecord?.createdByUserId||existingClientRecord?.userId||currentUser.id):currentUser.id,
         orgName:getVal('cOrgName').trim(),contactName:getVal('cContactName').trim(),mobile:getVal('cMobile').trim(),
-        officeMobile:getVal('cOfficeMobile').trim(),email:getVal('cEmail').trim(),gstin:getVal('cGstin').trim(),
+        officeMobile:getVal('cOfficeMobile').trim(),email:clientEmailClean(getVal('cEmail')),gstin:getVal('cGstin').trim(),
         state:getSelectOrOther('cState'),region:getSelectOrOther('cRegion'),district:getSelectOrOther('cDistrict'),
         tehsil:getSelectOrOther('cTehsil'),city:getSelectOrOther('cCityVillage'),pinCode:getSelectOrOther('cPinCode')||getVal('cPinManual'),address:getVal('cAddress'),
         salesOrderStatus:getSelectOrOther('cSalesOrderStatus')||'In Pipeline',salesType:getSelectOrOther('cSalesType'),leadTemp:getSelectOrOther('cLeadTemp'),
@@ -3529,12 +3640,13 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         return;
       }
       res.pendingUsers.forEach(u => {
-        let scopeFormatted = u.role === "State Head" ? `St: ${u.states}` : u.role === "Regional Head" ? `St: ${u.states} | Reg: ${u.regions}` : `St: ${u.states} | Dist: ${u.districts}`;
+        const _s=v=>escapeHtml(Array.isArray(v)?v.filter(Boolean).join(', '):(v??''));
+        let scopeFormatted = u.role === "State Head" ? `St: ${_s(u.states)}` : u.role === "Regional Head" ? `St: ${_s(u.states)} | Reg: ${_s(u.regions)}` : `St: ${_s(u.states)} | Dist: ${_s(u.districts)}`;
         tbody.innerHTML += `
           <tr>
-            <td class="fw-bold">${u.name}</td>
-            <td><small>${u.email}</small></td>
-            <td><span class="badge bg-dark">${u.role}</span></td>
+            <td class="fw-bold">${escapeHtml(u.name)}</td>
+            <td><small>${escapeHtml(u.email)}</small></td>
+            <td><span class="badge bg-dark">${escapeHtml(u.role)}</span></td>
             <td><small>${scopeFormatted}</small></td>
             <td>
               <button class="btn btn-sm btn-success me-1" onclick="approveUser('${u.id}', true)"><i class="bi bi-check-lg"></i></button>
@@ -4223,7 +4335,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     if(document.visibilityState==='visible'){
       touchUserActivity();
       setTimeout(()=>refreshData({silent:true,reason:'tab-visible'}),150);
-      if(!dataRefreshTimer) startLiveDataSync();
+      if(!dataRefreshTimer) startLiveDataSync({immediate:false});
     }else{
       stopLiveDataSync();
     }
@@ -5093,39 +5205,330 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
     }catch(e){showOperationMessage('Import failed',e.message,'error');}finally{markButtonProcessing(btn,false);}
   }
 
+  // =====================================================================================
+  // NOTIFICATION ENGINE
+  //  - Follow-up: ONE notification per client, only when the client's last activity is
+  //    FOLLOWUP_STALE_DAYS (11) days old or more AND the client has no sales activity
+  //    (no Sales Order and no "Done" sales status).
+  //  - Module notifications: tasks, approvals, sales orders (PI), targets, cold calls, attendance.
+  //  - "Mark read" for a single notification or "Mark all as read"; read state is remembered.
+  // =====================================================================================
+  const FOLLOWUP_STALE_DAYS=11, PI_PENDING_DAYS=7, TARGET_WARN_DAYS=3, COLDCALL_FOLLOWUP_DAYS=3;
+  const NOTIF_READ_KEY='KOSOL_NOTIF_READ_V1:';
   let notificationBadgeDismissed=false;
+  let notificationFeedCache=[];
+  let lastUnreadNotificationIds=new Set();
+  let derivedNotificationMemo={key:'',value:[]};
+
+  function notifStoreKey(){return NOTIF_READ_KEY+String(currentUser?.id||currentUser?.email||'').trim().toLowerCase();}
+  function loadNotifReadSet(){try{return new Set(JSON.parse(localStorage.getItem(notifStoreKey())||'[]'));}catch(_){return new Set();}}
+  function saveNotifReadSet(set){try{localStorage.setItem(notifStoreKey(),JSON.stringify([...set].slice(-1500)));}catch(_){}}
+  function notifLc(v){return String(v||'').trim().toLowerCase();}
+  function systemUserEmailSet(){
+    const s=new Set(); const add=v=>{const x=String(v||'').trim().toLowerCase(); if(x)s.add(x);};
+    add(currentUser&&currentUser.email);
+    (rawData.teamUsers||[]).forEach(u=>add(u&&u.email));
+    (Array.isArray(allUsersList)?allUsersList:[]).forEach(u=>add(u&&u.email));
+    return s;
+  }
+  // A client's e-mail can never be the e-mail of a login user of this system.
+  function clientEmailClean(v){
+    const x=String(v||'').trim(); if(!x) return '';
+    return systemUserEmailSet().has(x.toLowerCase())?'':x;
+  }
+  function isOwnRecordStrict(r){
+    if(!r||!currentUser) return false;
+    const uid=notifLc(currentUser.id), em=notifLc(currentUser.email);
+    return [r.userId,r.createdByUserId,r.ownerId,r.userEmail,r.createdBy,r.ownerEmail,r.owner].map(notifLc).filter(Boolean).some(v=>v===uid||v===em);
+  }
+  function identityKeysFor(org,phone,ids){
+    const keys=[]; const o=normalizeIdentityText(org); if(o) keys.push('o:'+o);
+    const p=normalizeIdentityPhone(phone); if(p.length>=10) keys.push('p:'+p.slice(-10));
+    (ids||[]).forEach(i=>{const s=String(i||'').trim(); if(s) keys.push('c:'+s);});
+    return keys;
+  }
+  function notifDayNumber(v){const n=appDateNumber(v);return Number.isNaN(n)?NaN:n;}
+  // Latest valid date among several fields (Math.max would return NaN if any field is empty).
+  function notifLatestDay(){let best=NaN;for(let i=0;i<arguments.length;i++){const n=notifDayNumber(arguments[i]);if(!Number.isNaN(n)&&(Number.isNaN(best)||n>best))best=n;}return best;}
+  function notifRecordDay(r){return notifLatestDay(r&&r.activityDate,r&&r.entryDate,r&&r.timestamp);}
+
+  // Groups every client record (visit) of the same organization / mobile into ONE client.
+  function buildClientGroups(){
+    const recs=Array.isArray(rawData.clients)?rawData.clients:[];
+    const parent=recs.map((_,i)=>i);
+    const find=x=>{while(parent[x]!==x){parent[x]=parent[parent[x]];x=parent[x];}return x;};
+    const owner=new Map(), recKeys=[];
+    recs.forEach((c,i)=>{
+      const keys=identityKeysFor(c.orgName||c.organization||c.organizationName,c.mobile||c.phone,[c.id,c.clientId,c.selectedClientId]);
+      recKeys[i]=keys;
+      // Only organization / mobile / explicit client link merge visits together.
+      keys.forEach(k=>{
+        if(k.startsWith('c:')&&String(c.id||'')===k.slice(2)) return;
+        if(owner.has(k)){const a=find(i),b=find(owner.get(k));if(a!==b)parent[a]=b;}else owner.set(k,i);
+      });
+    });
+    const groups=new Map();
+    recs.forEach((c,i)=>{const r=find(i);if(!groups.has(r))groups.set(r,{recs:[],keys:new Set()});const g=groups.get(r);g.recs.push(c);recKeys[i].forEach(k=>g.keys.add(k));});
+    return [...groups.values()];
+  }
+
+  function buildDerivedNotifications(backend){
+    const out=[]; if(!currentUser) return out;
+    const today=notifDayNumber(appToday()), DAY=86400000, todayStr=appToday();
+    const me={name:notifLc(currentUser.name),email:notifLc(currentUser.email),id:notifLc(currentUser.id)};
+    const isMe=v=>{const s=notifLc(v);return !!s&&(s===me.name||s===me.email||s===me.id);};
+    const backendKeys=new Set((backend||[]).map(n=>notifLc(n.module).replace(/[\s_-]/g,'')+'|'+String(n.recordId||'')));
+    const backendHas=(module,recordId)=>backendKeys.has(module+'|'+String(recordId||''));
+    const h=v=>quickHash(String(v));
+
+    // Sales activity + call activity lookups (built once, O(n)).
+    const salesKeys=new Set(), callLatest=new Map();
+    (rawData.salesOrders||[]).forEach(o=>identityKeysFor(o.orgName||o.organization||o.organizationName,o.contactNumber||o.mobile||o.phone,[o.clientId,o.clientID]).forEach(k=>salesKeys.add(k)));
+    (rawData.coldCalls||[]).forEach(c=>{
+      const d=notifRecordDay(c);
+      if(Number.isNaN(d)) return;
+      identityKeysFor(c.orgName||c.organization||c.clientName,c.phone||c.mobile||c.contactNumber,[c.clientId,c.clientID]).forEach(k=>{if(!callLatest.has(k)||callLatest.get(k)<d)callLatest.set(k,d);});
+    });
+
+    // 1) FOLLOW-UP: one per client, 11+ days without activity and without any sales activity.
+    const clientLatest=new Map();
+    buildClientGroups().forEach(g=>{
+      if(!g.recs.some(isOwnRecordStrict)) return;
+      const sold=g.recs.some(c=>String(c.salesOrderStatus||'').trim().toLowerCase()==='done')||[...g.keys].some(k=>salesKeys.has(k));
+      let last=NaN;
+      g.recs.forEach(c=>{const d=notifRecordDay(c);if(!Number.isNaN(d)&&(Number.isNaN(last)||d>last))last=d;});
+      g.keys.forEach(k=>{const d=callLatest.get(k);if(d!==undefined&&(Number.isNaN(last)||d>last))last=d;});
+      if(!Number.isNaN(last)) g.keys.forEach(k=>{if(!clientLatest.has(k)||clientLatest.get(k)<last)clientLatest.set(k,last);});
+      if(sold||Number.isNaN(last)) return;
+      const days=Math.floor((today-last)/DAY);
+      if(days<FOLLOWUP_STALE_DAYS) return;
+      const latestRec=g.recs.slice().sort((a,b)=>(notifRecordDay(b)||0)-(notifRecordDay(a)||0))[0];
+      const ownRec=g.recs.filter(isOwnRecordStrict).sort((a,b)=>(notifRecordDay(b)||0)-(notifRecordDay(a)||0))[0]||latestRec;
+      const org=ownRec.orgName||ownRec.organization||ownRec.organizationName||ownRec.contactName||'Client';
+      const lastStr=new Date(last).toISOString().slice(0,10);
+      const gk=[...g.keys].filter(k=>!k.startsWith('c:')).sort()[0]||('c:'+ownRec.id);
+      out.push({id:'FU|'+h(gk)+'|'+lastStr,type:'LEAD_FOLLOWUP',module:'clients',recordId:ownRec.id,_derived:true,
+        _recordIds:g.recs.map(c=>String(c.id)),_days:days,severity:days>=30?'danger':days>=20?'warning':'primary',
+        title:'Follow-up due: '+org,
+        message:'No activity for '+days+' days and no sales order yet. Last activity: '+lastStr+(ownRec.contactName?' · Contact: '+ownRec.contactName:'')+(ownRec.mobile?' ('+ownRec.mobile+')':'')+'.',
+        timestamp:todayStr});
+    });
+    out.sort((a,b)=>b._days-a._days);
+
+    // 2) TASKS (assigned to me): new / due-today / overdue; reverted tasks that I assigned.
+    (rawData.tasks||[]).forEach(t=>{
+      const st=String(t.status||'').trim().toUpperCase(); if(st==='DONE'||st==='NOT DONE') return;
+      if(backendHas('tasks',t.id)) return;
+      const due=notifDayNumber(t.followUpDate);
+      if(isMe(t.assignedTo)){
+        if(!Number.isNaN(due)&&due<=today){
+          const late=Math.floor((today-due)/DAY);
+          out.push({id:'TSK|'+h(t.id)+'|'+appDateOnly(t.followUpDate)+'|'+st,type:'TASK_DUE',module:'tasks',recordId:t.id,_derived:true,severity:late>0?'danger':'warning',
+            title:(late>0?'Task overdue: ':'Task due today: ')+(t.title||t.id),message:(late>0?'Overdue by '+late+' day(s). ':'')+'Assigned by '+(t.assignedBy||'—')+'. Current status: '+st+'.',timestamp:todayStr});
+        }else if(st==='PIPELINE'){
+          out.push({id:'TSKN|'+h(t.id)+'|'+st,type:'TASK_ASSIGNED',module:'tasks',recordId:t.id,_derived:true,severity:'primary',
+            title:'New task assigned: '+(t.title||t.id),message:'Assigned by '+(t.assignedBy||'—')+(t.followUpDate?' · Follow-up date '+t.followUpDate:'')+'.',timestamp:todayStr});
+        }
+      }else if(st==='REVERTED'&&isMe(t.assignedBy)){
+        out.push({id:'TSKR|'+h(t.id)+'|'+st,type:'TASK_REVERTED',module:'tasks',recordId:t.id,_derived:true,severity:'warning',
+          title:'Task reverted back: '+(t.title||t.id),message:(t.assignedTo||'The assignee')+' reverted this task to you.',timestamp:todayStr});
+      }
+    });
+
+    // 3) APPROVALS: pending for my action, and results of requests I raised.
+    (rawData.approvals||[]).forEach(a=>{
+      if(backendHas('approvals',a.id)) return;
+      const st=String(a.status||'').trim().toUpperCase();
+      const isApprover=currentUser.role==='Master Admin'||currentUser.role===a.targetApproverRole;
+      const mine=isMe(a.requestedByName)||isMe(a.requestedByEmail)||isMe(a.requestedBy)||isMe(a.requestedById)||isMe(a.userEmail)||isMe(a.userId);
+      if(st==='PENDING'&&isApprover&&!mine){
+        out.push({id:'APR|'+h(a.id)+'|'+st,type:'APPROVAL_PENDING',module:'approvals',recordId:a.id,_derived:true,severity:'warning',
+          title:'Approval pending: '+(a.category||'Request'),message:(a.requestedByName||'A team member')+' is waiting for your decision. '+(a.details||''),timestamp:todayStr});
+      }else if(mine&&(st==='APPROVED'||st==='REJECTED')){
+        out.push({id:'APR|'+h(a.id)+'|'+st,type:'APPROVAL_RESULT',module:'approvals',recordId:a.id,_derived:true,severity:st==='APPROVED'?'success':'danger',
+          title:'Your request was '+st.toLowerCase()+': '+(a.category||'Request'),message:a.approverRemarks||'No remarks.',timestamp:todayStr});
+      }
+    });
+
+    // 4) SALES ORDERS: my orders whose PI is still Pending after PI_PENDING_DAYS.
+    (rawData.salesOrders||[]).forEach(o=>{
+      if(!isOwnRecordStrict(o)) return;
+      if(String(o.piStatus||'').trim().toLowerCase()!=='pending') return;
+      const id=o.id||o.orderId; if(backendHas('salesorders',id)) return;
+      const d=notifDayNumber(o.date||o.entryDate); if(Number.isNaN(d)) return;
+      const age=Math.floor((today-d)/DAY); if(age<PI_PENDING_DAYS) return;
+      out.push({id:'SO|'+h(id)+'|pending',type:'SALES_ORDER_PI',module:'salesorders',recordId:id,_derived:true,severity:age>=14?'danger':'warning',
+        title:'PI pending: '+(o.orgName||o.organization||'Sales order'),message:'Proforma invoice is still Pending after '+age+' days (order date '+appDateOnly(o.date||o.entryDate)+').',timestamp:todayStr});
+    });
+
+    // 5) TARGETS: my targets ending within TARGET_WARN_DAYS that are not yet achieved.
+    (rawData.targets||[]).forEach(t=>{
+      if(!(isMe(t.userEmail)||isMe(t.userId))) return;
+      if(backendHas('targets',t.id)) return;
+      let end=''; try{end=targetEndLocal(t.periodType,t.startDate,t.endDate);}catch(_){end=appDateOnly(t.endDate);}
+      const e=notifDayNumber(end); if(Number.isNaN(e)) return;
+      const left=Math.floor((e-today)/DAY); if(left<0||left>TARGET_WARN_DAYS) return;
+      let ach=0; try{ach=targetAchievementLocal(t,rawData.salesOrders||[]);}catch(_){}
+      const tar=salesOrderNum(t.targetValue||0); if(!tar||ach>=tar) return;
+      const pct=Math.min(100,ach/tar*100);
+      out.push({id:'TGT|'+h(t.id)+'|'+end,type:'TARGET_DEADLINE',module:'targets',recordId:t.id,_derived:true,severity:left===0?'danger':'warning',
+        title:'Target ending '+(left===0?'today':'in '+left+' day(s)')+': '+(t.targetName||'Target'),message:'Achieved '+pct.toFixed(1)+'% of the target so far.',timestamp:todayStr});
+    });
+
+    // 6) COLD CALLS: latest call per lead needing a call-back, with no later call / visit / sale.
+    const seen=new Set();
+    (rawData.coldCalls||[]).filter(isOwnRecordStrict).map(c=>({c,d:notifRecordDay(c)}))
+      .filter(x=>!Number.isNaN(x.d)).sort((a,b)=>b.d-a.d).forEach(({c,d})=>{
+        const keys=identityKeysFor(c.orgName||c.organization||c.clientName,c.phone||c.mobile||c.contactNumber,[c.clientId,c.clientID]);
+        if(keys.some(k=>seen.has(k))) return; keys.forEach(k=>seen.add(k));
+        const outcome=String(c.outcome||c.callOutcome||'').trim().toLowerCase();
+        if(!['follow up required','call back later','interested'].includes(outcome)) return;
+        if(backendHas('coldcalls',c.id)) return;
+        if(keys.some(k=>salesKeys.has(k))) return;
+        if(keys.some(k=>(clientLatest.get(k)||0)>d)) return;
+        const age=Math.floor((today-d)/DAY); if(age<COLDCALL_FOLLOWUP_DAYS) return;
+        out.push({id:'CC|'+h(c.id)+'|'+outcome,type:'COLD_CALL_FOLLOWUP',module:'coldcalls',recordId:c.id,_derived:true,severity:age>=7?'warning':'primary',
+          title:'Cold call follow-up: '+(c.orgName||c.organization||c.clientName||'Lead'),message:'Last call outcome "'+(c.outcome||c.callOutcome)+'" was '+age+' days ago with no later activity.',timestamp:todayStr});
+      });
+
+    // 7) ATTENDANCE: weekday, after the 09:15 window, no punch recorded today.
+    const now=new Date(), wd=now.getDay(), hr=now.getHours()+now.getMinutes()/60;
+    const hasBackendAtt=(backend||[]).some(n=>String(n.type||'').toUpperCase().includes('ATTENDANCE')&&!n.read);
+    if(wd>=1&&wd<=5&&hr>9.25&&!rawData.todayAttendance&&!hasBackendAtt){
+      out.push({id:'ATT|'+todayStr,type:'ATTENDANCE_PENDING',module:'attendance',recordId:'',_derived:true,severity:hr>14?'danger':'warning',
+        title:'Attendance not marked today',message:'No punch-in is recorded for today yet. Open Attendance to mark it.',timestamp:todayStr});
+    }
+    return out;
+  }
+
+  function getDerivedNotificationsCached(backend){
+    const key=[lastDataFingerprint,appToday(),Math.floor(Date.now()/300000),notifLc(currentUser?.id||currentUser?.email),(backend||[]).length].join('|');
+    if(derivedNotificationMemo.key!==key){ derivedNotificationMemo={key,value:buildDerivedNotifications(backend)}; }
+    return derivedNotificationMemo.value;
+  }
+
+  // Effective feed = backend notifications (follow-ups replaced by the one-per-client rule) + module notifications.
+  function getNotificationFeed(){
+    const readSet=loadNotifReadSet();
+    const backend=Array.isArray(rawData.notifications)?rawData.notifications:[];
+    const derived=getDerivedNotificationsCached(backend);
+    const backendFollow=backend.filter(n=>String(n.type||'').toUpperCase()==='LEAD_FOLLOWUP');
+    const kept=backend.filter(n=>String(n.type||'').toUpperCase()!=='LEAD_FOLLOWUP')
+      .map(n=>Object.assign({},n,{read:!!n.read||readSet.has(String(n.id))}));
+    const derivedOut=derived.map(n=>{
+      const c=Object.assign({},n,{read:readSet.has(String(n.id))});
+      if(n.type==='LEAD_FOLLOWUP'){
+        const set=new Set(n._recordIds||[]);
+        c._backendIds=backendFollow.filter(b=>set.has(String(b.recordId))).map(b=>b.id);
+      }
+      return c;
+    });
+    const rank={danger:0,warning:1,primary:2,success:3};
+    const all=derivedOut.concat(kept);
+    return all.map((n,i)=>({n,i})).sort((a,b)=>{
+      if(a.n.read!==b.n.read) return a.n.read?1:-1;
+      const ra=rank[a.n.severity]??2, rb=rank[b.n.severity]??2;
+      return ra!==rb?ra-rb:a.i-b.i;
+    }).map(x=>x.n);
+  }
+  function refreshNotificationFeed(){ notificationFeedCache=getNotificationFeed(); return notificationFeedCache; }
+
   function renderNotificationBadge(){
     const e=document.getElementById('notificationBadge');if(!e)return;
-    const n=(rawData.notifications||[]).filter(x=>!x.read);e.textContent=String(n.length);
+    const n=refreshNotificationFeed().filter(x=>!x.read);e.textContent=n.length>99?'99+':String(n.length);
     e.classList.toggle('d-none',notificationBadgeDismissed||n.length===0);
   }
+  function syncNotificationBadgeAfterRefresh(){
+    const ids=new Set(refreshNotificationFeed().filter(n=>!n.read).map(n=>String(n.id)));
+    let hasNew=false; ids.forEach(id=>{if(!lastUnreadNotificationIds.has(id)) hasNew=true;});
+    lastUnreadNotificationIds=ids;
+    if(hasNew) notificationBadgeDismissed=false;
+    renderNotificationBadge();
+    if(document.getElementById('notificationListHost')) renderNotificationListInPlace();
+  }
+
+  function notifPriorityClass(n){
+    if(n.severity) return n.severity;
+    return n.title?.includes('MAX PRIORITY')?'danger':n.title?.includes('HIGH PRIORITY')?'warning':'primary';
+  }
+  function notifModuleLabel(n){
+    const m=String(n.module||'').toLowerCase().replace(/[\s_-]/g,'');
+    return ({clients:'Client Entry',coldcalls:'Cold Calls',salesorders:'Sales Orders',tasks:'Tasks',approvals:'Approvals',targets:'Targets',attendance:'Attendance',projects:'Projects'})[m]||(n.module||'');
+  }
+  function renderNotificationListInPlace(){
+    const host=document.getElementById('notificationListHost'); if(!host) return;
+    const list=refreshNotificationFeed(), unread=list.filter(n=>!n.read).length, MAX=150;
+    const btn=document.getElementById('notifMarkAllBtn');
+    if(btn){btn.disabled=unread===0;btn.innerHTML='<i class="bi bi-check2-all me-1"></i>Mark all as read'+(unread?' ('+unread+')':'');}
+    const shown=list.slice(0,MAX);
+    host.innerHTML=`<div class="notification-list">${shown.length?shown.map(n=>{
+      const unreadItem=!n.read,type=String(n.type||'').toUpperCase(),isAtt=type.includes('ATTENDANCE'),id=escapeAttr(n.id);
+      return `<div class="notification-action-card border rounded p-2 mb-2 ${unreadItem?'bg-light':''}" role="button" tabindex="0" onclick="notificationCardClick('${id}')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();notificationCardClick('${id}')}">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div><span class="badge text-bg-${notifPriorityClass(n)}">${escapeHtml(n.type||'Notification')}</span>${notifModuleLabel(n)?` <span class="badge text-bg-light border">${escapeHtml(notifModuleLabel(n))}</span>`:''} <b>${escapeHtml(n.title||'')}</b><small class="d-block text-muted">${escapeHtml(n.timestamp||'')}</small></div>
+          ${unreadItem?`<button type="button" class="btn btn-sm btn-outline-secondary flex-shrink-0" onclick="event.stopPropagation();markNotificationsRead(['${id}'])"><i class="bi bi-check2 me-1"></i>Mark read</button>`:'<span class="badge text-bg-secondary flex-shrink-0">Read</span>'}
+        </div>
+        <div class="small mt-1">${escapeHtml(n.message||'')}</div>
+        <div class="small text-warning fw-bold mt-2"><i class="bi bi-arrow-right-circle me-1"></i>Click to ${unreadItem?'mark read and ':''}${isAtt?'open Attendance':n.recordId?'take action':n.module?'open '+escapeHtml(notifModuleLabel(n)):'close'}</div>
+      </div>`;}).join('')+(list.length>MAX?`<div class="small text-muted text-center py-2">Showing the first ${MAX} of ${list.length} notifications.</div>`:''):'<div class="text-center text-muted py-4">No actionable notifications.</div>'}</div>`;
+  }
+
   async function openNotifications(){
     notificationBadgeDismissed=true;document.getElementById('notificationBadge')?.classList.add('d-none');
     try{
-      const r=await callBackendFast('getNotifications',{});if(!r.success)throw Error(r.message||'Unable to load notifications.');
-      rawData.notifications=r.notifications||[];const list=rawData.notifications;
-      const html=`<div class="notification-list">${list.length?list.map(n=>{
-        const unread=!n.read,type=String(n.type||'').toUpperCase(),isAtt=type.includes('ATTENDANCE');
-        const priority=n.title?.includes('MAX PRIORITY')?'danger':n.title?.includes('HIGH PRIORITY')?'warning':'primary';
-        return `<div class="notification-action-card border rounded p-2 mb-2 ${unread?'bg-light':''}" role="button" tabindex="0" onclick="notificationCardClick('${escapeAttr(n.id)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();notificationCardClick('${escapeAttr(n.id)}')}">
-          <div><span class="badge text-bg-${priority}">${escapeHtml(n.type||'Notification')}</span> <b>${escapeHtml(n.title||'')}</b><small class="d-block text-muted">${escapeHtml(n.timestamp||'')}</small></div>
-          <div class="small mt-1">${escapeHtml(n.message||'')}</div>
-          <div class="small text-warning fw-bold mt-2"><i class="bi bi-arrow-right-circle me-1"></i>Click to mark read${isAtt?' and open Attendance':n.recordId?' and take action':n.module?' and open '+escapeHtml(n.module):''}</div>
-        </div>`;}).join(''):'<div class="text-center text-muted py-4">No actionable notifications.</div>'}</div>`;
-      modal(`<div><div class="dashboard-popup-title"><i class="bi bi-bell-fill me-2"></i>Notifications</div><div class="small text-muted mb-2">Clicking a notification marks it as read. Specific notifications automatically open their related action/module. The unread count is updated immediately.</div>${html}</div>`);
+      const r=await callBackendFast('getNotifications',{},{fresh:true});if(!r.success)throw Error(r.message||'Unable to load notifications.');
+      rawData.notifications=r.notifications||[];
+      refreshNotificationFeed();
+      modal(`<div><div class="dashboard-popup-title"><i class="bi bi-bell-fill me-2"></i>Notifications</div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <div class="small text-muted">Follow-ups appear once per client after ${FOLLOWUP_STALE_DAYS} days without activity or sales. Click a notification to mark it read and open its module.</div>
+          <button type="button" id="notifMarkAllBtn" class="btn btn-sm btn-outline-dark" onclick="markAllNotificationsRead()"><i class="bi bi-check2-all me-1"></i>Mark all as read</button>
+        </div><div id="notificationListHost"></div></div>`);
+      renderNotificationListInPlace();
     }catch(e){notificationBadgeDismissed=false;renderNotificationBadge();showOperationMessage('Notifications failed',e.message,'error');}
   }
+
+  // Marks the given notification ids as read (instantly on screen), then syncs to the backend in the background.
+  async function markNotificationsRead(ids){
+    const idSet=new Set((ids||[]).map(String));
+    const feed=notificationFeedCache.length?notificationFeedCache:refreshNotificationFeed();
+    const readSet=loadNotifReadSet(), targets=[];
+    feed.forEach(n=>{if(idSet.has(String(n.id))&&!n.read){readSet.add(String(n.id));n.read=true;targets.push(n);}});
+    if(!targets.length) return 0;
+    saveNotifReadSet(readSet);
+    (rawData.notifications||[]).forEach(b=>{if(idSet.has(String(b.id)))b.read=true;});
+    renderNotificationBadge(); renderNotificationListInPlace();
+    const backendIds=[]; targets.forEach(n=>{ if(n._derived){(n._backendIds||[]).forEach(x=>backendIds.push(x));} else backendIds.push(n.id); });
+    (async()=>{
+      const queue=backendIds.slice();
+      const worker=async()=>{while(queue.length){const id=queue.shift();try{await callBackend('markNotificationRead',{id});}catch(_){}}};
+      await Promise.all([worker(),worker(),worker()]);
+    })();
+    return targets.length;
+  }
+  async function markAllNotificationsRead(){
+    const ids=refreshNotificationFeed().filter(n=>!n.read).map(n=>n.id);
+    if(!ids.length) return;
+    await markNotificationsRead(ids);
+  }
+
   async function notificationCardClick(notificationId){
-    const n=(rawData.notifications||[]).find(x=>String(x.id)===String(notificationId));if(!n)return;
+    const n=(notificationFeedCache.length?notificationFeedCache:refreshNotificationFeed()).find(x=>String(x.id)===String(notificationId));if(!n)return;
     const type=String(n.type||'').toUpperCase();
     try{
-      if(!n.read&&type==='LEAD_FOLLOWUP'){const r=await callBackend('markNotificationRead',{id:notificationId});if(r.success)n.read=true;}
-      renderNotificationBadge();
+      if(!n.read) markNotificationsRead([notificationId]);
       if(type.includes('ATTENDANCE')){closeModal(true);await switchTab('attendance');setTimeout(()=>document.getElementById('attendanceActionContainer')?.scrollIntoView({behavior:'smooth',block:'center'}),250);return;}
       if(type==='LEAD_FOLLOWUP'&&n.recordId){closeModal(true);await openLeadAction(n.recordId,n.id);return;}
       if(n.module){closeModal(true);await openNotificationTargetModule(n.module,n.recordId);return;}
       closeModal(true);
     }catch(e){showOperationMessage('Notification action failed',e.message,'error');}
+  }
+  // Follow-up action: opens Client Entry with the existing client loaded for a NEW visit dated today.
+  async function openLeadAction(recordId){
+    await switchTab('clients');
+    const c=(rawData.clients||[]).find(x=>String(x.id)===String(recordId)); if(!c) return;
+    openClientModal();
+    selectExistingClientFromSearch(c.id);
   }
   async function openNotificationTargetModule(module,recordId){
     const key=String(module||'').trim().toLowerCase().replace(/[\s_-]/g,'');
@@ -6163,33 +6566,80 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
     return /^(get|fetch|load|list|search|check|validate|dashboard)/i.test(String(action||''));
   }
 
+  let backendCacheGeneration=0;
   async function callBackendFast(action,payload={},options={}){
     const key=backendReadKey(action,payload);
     const now=Date.now();
-    if(isBackendReadAction(action)){
-      const cached=BACKEND_READ_CACHE.get(key);
-      if(cached && now-cached.time<BACKEND_READ_TTL) return cached.value;
+    const isRead=isBackendReadAction(action);
+    if(isRead){
+      if(!options.fresh){
+        const cached=BACKEND_READ_CACHE.get(key);
+        if(cached && now-cached.time<BACKEND_READ_TTL) return cached.value;
+      }
       if(BACKEND_INFLIGHT.has(key)) return BACKEND_INFLIGHT.get(key);
     }
+    const generation=backendCacheGeneration;
     const request=callBackend(action,payload);
-    if(isBackendReadAction(action)){
+    if(isRead){
       BACKEND_INFLIGHT.set(key,request);
       try{
         const value=await request;
-        BACKEND_READ_CACHE.set(key,{time:Date.now(),value});
+        // Never cache failures, and never cache a response that was requested before a write
+        // invalidated the cache (it could contain pre-save data).
+        if(generation===backendCacheGeneration && value && value.success!==false) BACKEND_READ_CACHE.set(key,{time:Date.now(),value});
         return value;
       }finally{
-        BACKEND_INFLIGHT.delete(key);
+        if(BACKEND_INFLIGHT.get(key)===request) BACKEND_INFLIGHT.delete(key);
       }
     }
     return request;
   }
 
   function invalidateBackendReadCache(){
+    backendCacheGeneration++;
     BACKEND_READ_CACHE.clear();
+    BACKEND_INFLIGHT.clear();
   }
 
-  async function callBackend(action, payload) {
+  // Actions that do not change shared business data (no data refresh needed after them).
+  const NON_DATA_ACTIONS=new Set(['markNotificationRead','login','health','lookupPinCode','touchUserActivity','sendChatMessage','selfRegister','requestPasswordResetOtp','resetPasswordWithOtp']);
+  function isDataMutatingAction(action){
+    return !isBackendReadAction(action) && !NON_DATA_ACTIONS.has(String(action||''));
+  }
+  // Every save / update / delete / approval automatically drops stale cached reads and makes sure the
+  // screen is re-synchronised (other open tabs are notified too) - no manual refresh needed.
+  function onBackendDataMutated(action,result){
+    invalidateBackendReadCache();
+    const writeTime=Date.now();
+    pollUnchangedCount=0;
+    if(result && result.success!==false){
+      try{ if(dataSyncChannel) dataSyncChannel.postMessage({type:'data-changed',action:String(action),at:writeTime}); }catch(e){}
+    }
+    // Safety net: most handlers already call refreshData(); if none started one, do it here.
+    setTimeout(()=>{
+      if(currentUser && lastRefreshStartedAt<writeTime) refreshData({silent:true,reason:'after-write',force:true});
+    },1200);
+  }
+
+  async function callBackend(action,payload){
+    const result=await callBackendRaw(action,payload);
+    try{ if(isDataMutatingAction(action)) onBackendDataMutated(action,result); }catch(e){ console.warn('post-write sync skipped:',e); }
+    return result;
+  }
+
+  // Backend/sheet cells can arrive as the literal text "null" / "undefined" (or "nullnullnull..." when
+  // several empty cells were concatenated). Those strings are converted to empty text so they never
+  // appear on screen. Real JSON nulls are left untouched (some logic relies on them).
+  const NULL_TEXT_RE=/^\s*(?:null|undefined)(?:\s*[,|/-]?\s*(?:null|undefined))*\s*$/i;
+  function cleanNullText(v){
+    if(typeof v==='string') return NULL_TEXT_RE.test(v)?'':v;
+    if(Array.isArray(v)){for(let i=0;i<v.length;i++){const x=v[i];if(typeof x==='string'){if(NULL_TEXT_RE.test(x))v[i]='';}else if(x&&typeof x==='object')cleanNullText(x);}return v;}
+    if(v&&typeof v==='object'){for(const k in v){const x=v[k];if(typeof x==='string'){if(NULL_TEXT_RE.test(x))v[k]='';}else if(x&&typeof x==='object')cleanNullText(x);}}
+    return v;
+  }
+
+  const CLIENT_EMAIL_ACTIONS=new Set(['saveClient','updateClient','saveColdCall','updateColdCall']);
+  async function callBackendRaw(action, payload) {
     const requestPayload = (payload && typeof payload === 'object') ? Object.assign({}, payload) : {};
     const ownCrudActions=new Set(['updateClient','deleteClient','updateColdCall','deleteColdCall','updateSalesOrder','deleteSalesOrder']);
     if(ownCrudActions.has(action) && !isMasterAdminUser()){
@@ -6212,7 +6662,10 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
         clearPersistedSession(); currentUser=null;
         return { success:false, message:'Your login session is missing its security token. Please sign in again.' };
       }
-      requestPayload.email=requestPayload.email||currentUser.email;
+      // For client / cold-call saves `email` is the CLIENT's e-mail. It must never fall back to the
+      // logged-in user's e-mail (the user identity is already sent as userEmail / userId / authToken).
+      if(CLIENT_EMAIL_ACTIONS.has(action)){ if(requestPayload.email===undefined||requestPayload.email===null) requestPayload.email=''; }
+      else requestPayload.email=requestPayload.email||currentUser.email;
       requestPayload.authToken=requestPayload.authToken||currentUser.authToken;
       requestPayload.userId=requestPayload.userId||currentUser.id;
       requestPayload.userRole=requestPayload.userRole||currentUser.role;
@@ -6226,6 +6679,7 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
       if(!response.ok) return {success:false,message:`Backend HTTP ${response.status}. Verify Web App deployment access is set to Anyone.`};
       let result; try{result=JSON.parse(text);}catch(_){return {success:false,message:'Backend returned HTML/non-JSON. This usually means the Apps Script URL is not the deployed /exec URL or the deployment is not accessible.'};}
       if(!result || typeof result!=='object') return {success:false,message:'Backend returned an empty/invalid response.'};
+      result=cleanNullText(result);
       if(result.success===false && /session expired|authentication required|unauthorized user/i.test(String(result.message||''))){clearPersistedSession();currentUser=null;}
       return result;
     } catch(err) {
@@ -6895,5 +7349,50 @@ const oldSwitchTab=window.switchTab;window.switchTab=async function(tabId,event)
 })();
 </script>
 
+<script id="kosol-null-text-guard">
+(function(){
+  // Safety net: never show "null", "undefined" or "nullnullnull..." as visible text or form values.
+  var BAD=/^\s*(?:null|undefined)(?:\s*[,|/-]?\s*(?:null|undefined))*\s*$/i;
+  function fixValueSetter(C){
+    try{
+      var d=Object.getOwnPropertyDescriptor(C.prototype,'value'); if(!d||!d.set||d.set.__kosolGuard) return;
+      var set=function(v){ d.set.call(this,(v===null||v===undefined||(typeof v==='string'&&BAD.test(v)))?'':v); };
+      set.__kosolGuard=true;
+      Object.defineProperty(C.prototype,'value',{get:d.get,set:set,configurable:true,enumerable:d.enumerable});
+    }catch(e){}
+  }
+  fixValueSetter(HTMLInputElement); fixValueSetter(HTMLTextAreaElement);
+  function cleanTextNodes(root){
+    try{
+      if(!root) return;
+      if(root.nodeType===3){ if(BAD.test(root.nodeValue||'')) root.nodeValue=''; return; }
+      if(root.nodeType!==1 && root.nodeType!==11) return;
+      var tag=root.nodeName; if(tag==='SCRIPT'||tag==='STYLE') return;
+      var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null,false), n;
+      while((n=w.nextNode())){ var p=n.parentNode&&n.parentNode.nodeName; if(p==='SCRIPT'||p==='STYLE') continue; if(BAD.test(n.nodeValue||'')) n.nodeValue=''; }
+      if(root.querySelectorAll){
+        root.querySelectorAll('input,textarea').forEach(function(el){ if(BAD.test(el.value||'')) el.value=''; });
+      }
+    }catch(e){}
+  }
+  var queue=new Set(), scheduled=false;
+  function flush(){
+    scheduled=false; var items=Array.from(queue); queue.clear();
+    items.forEach(function(n){ if(n.isConnected!==false) cleanTextNodes(n); });
+  }
+  function schedule(){ if(!scheduled){ scheduled=true; (window.requestAnimationFrame||setTimeout)(flush); } }
+  function start(){
+    cleanTextNodes(document.body);
+    new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        if(m.type==='characterData'){ queue.add(m.target); }
+        else { m.addedNodes.forEach(function(n){ queue.add(n); }); }
+      });
+      if(queue.size) schedule();
+    }).observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.body) start(); else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
 </body>
 </html>
