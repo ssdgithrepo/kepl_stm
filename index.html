@@ -3029,9 +3029,25 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     const box=document.getElementById(boxId); if(!box)return [];
     const q=String(query||'').trim().toLowerCase();
     const list=(rawData.clients||[]).filter(c=>!q||[c.orgName,c.contactName,c.mobile,c.email].some(v=>String(v||'').toLowerCase().includes(q))).slice(0,30);
-    box.innerHTML=list.length
-      ? list.map(c=>`<button type="button" class="search-option text-start w-100 bg-white border-0" data-id="${escapeAttr(c.id)}" role="option"><strong>${escapeHtml(c.orgName||'')}</strong><br><small>${escapeHtml(c.contactName||'')} · ${escapeHtml(c.mobile||'')}</small></button>`).join('')
-      : `<div class="search-option text-muted">${escapeHtml(emptyText||'No existing client found — continue typing to create a new one.')}</div>`;
+    if(list.length){
+      if(box.__noMatchAutoCloseTimer){clearTimeout(box.__noMatchAutoCloseTimer);box.__noMatchAutoCloseTimer=null;}
+      box.innerHTML=list.map(c=>`<button type="button" class="search-option text-start w-100 bg-white border-0" data-id="${escapeAttr(c.id)}" role="option"><strong>${escapeHtml(c.orgName||'')}</strong><br><small>${escapeHtml(c.contactName||'')} · ${escapeHtml(c.mobile||'')}</small></button>`).join('');
+    }else{
+      box.innerHTML=`<div class="client-no-match search-option text-muted" role="status">
+        <span>${escapeHtml(emptyText||'No existing client found — continue typing to create a new one.')}</span>
+        <button type="button" class="btn-close" aria-label="Close message" title="Close message"></button>
+      </div>`;
+      const close=box.querySelector('.client-no-match .btn-close');
+      close?.addEventListener('click',ev=>{
+        ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation?.();
+        if(box.__noMatchAutoCloseTimer){clearTimeout(box.__noMatchAutoCloseTimer);box.__noMatchAutoCloseTimer=null;}
+        box.classList.remove('show');box.style.display='none';
+      });
+      box.__noMatchAutoCloseTimer=setTimeout(()=>{
+        box.classList.remove('show');box.style.display='none';
+        box.__noMatchAutoCloseTimer=null;
+      },3000);
+    }
     box.classList.add('show'); box.style.display='block';
     box.__backendClients=list; // compatibility for existing selectors; source remains rawData.clients
     if(!box.dataset.existingClientSelectionBound){
@@ -3125,7 +3141,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       email: clientEmailClean(document.getElementById('ccEmail').value),
       state: getSelectOrOther('ccState'), region: getSelectOrOther('ccRegion'), district: getSelectOrOther('ccDistrict'),
       tehsil: getSelectOrOther('ccTehsil'), city: getSelectOrOther('ccCityVillage'),
-      visitType: getSelectOrOther('ccVisitType'), visitCount: computedCallCount,
+      visitType: computedCallCount>1 ? 'Follow Up' : getSelectOrOther('ccVisitType'), visitCount: computedCallCount,
       pinCode: getSelectOrOther('ccPinCode') || getVal('ccPinManual'), address: getVal('ccAddress'), reasonForNoVisit: getVal('ccReason'), callStatus: getSelectOrOther('ccCallStatus'),
       callOutcome: getSelectOrOther('ccOutcome'), leadTemp: getSelectOrOther('ccLeadTemp'),
       requirements: getVal('ccRequirements'), remarks: getVal('ccRemarks'),
@@ -3727,7 +3743,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         state:getSelectOrOther('cState'),region:getSelectOrOther('cRegion'),district:getSelectOrOther('cDistrict'),
         tehsil:getSelectOrOther('cTehsil'),city:getSelectOrOther('cCityVillage'),pinCode:getSelectOrOther('cPinCode')||getVal('cPinManual'),address:getVal('cAddress'),
         salesOrderStatus:getSelectOrOther('cSalesOrderStatus')||'In Pipeline',salesType:getSelectOrOther('cSalesType'),leadTemp:getSelectOrOther('cLeadTemp'),
-        visitType:getSelectOrOther('cVisitType'),visitCount:computedVisitCount,visitStatus:getSelectOrOther('cVisitStatus'),meetingStatus:getSelectOrOther('cMeetingStatus'),callStatus:getSelectOrOther('cCallStatus'),
+        visitType:computedVisitCount>1 ? 'Follow Up' : getSelectOrOther('cVisitType'),visitCount:computedVisitCount,visitStatus:getSelectOrOther('cVisitStatus'),meetingStatus:getSelectOrOther('cMeetingStatus'),callStatus:getSelectOrOther('cCallStatus'),
         entryDate:getVal('cEntryDate'),activityDate:getVal('cEntryDate'),nextFollowUpDate:getVal('cNextFollowUpDate'),requirements:getVal('cRequirements'),remarks:getVal('cRemarks'),locationImageData:imageData
       };
 
@@ -6187,6 +6203,7 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
       ${table('Client / Lead Data — Exact Backend Structure',clientCols,clients.map(r=>backendRows([r],clientCols)[0]))}
       ${table('Cold Calling Lead Data — Exact Backend Structure',coldCols,calls.map(r=>backendRows([r],coldCols)[0]))}
       
+
 </body></html>`;
   }
   async function captureDashboardImage(){
@@ -8099,6 +8116,115 @@ setInterval(()=>{
     try{return await run;}finally{window.__kosolV4RefreshInFlight=null;}
   };
   window.retryCurrentDataLoad=()=>window.refreshData({silent:false,reason:'manual-retry',force:true});
+})();
+</script>
+<style id="kosol-form-behavior-v8">
+/* Data-entry forms stay open until the user closes them or a confirmed save completes. */
+.modal[data-kosol-entry-modal="1"] .modal-dialog{max-height:calc(100vh - 2rem)}
+.kosol-inline-no-match,.client-no-match{display:flex;align-items:center;justify-content:space-between;gap:.75rem;width:100%;padding:.55rem .7rem}
+.kosol-inline-no-match .btn-close,.client-no-match .btn-close{flex:0 0 auto;font-size:.72rem}
+</style>
+<script id="kosol-form-behavior-v8">
+(function(){
+  'use strict';
+  const SAVE_WORDS=/\b(saved|save|updated|update|created|create|submitted|submit|added|add|deleted|delete|completed|complete)\b/i;
+  const NO_MATCH=/no existing client found/i;
+  let noMatchTimer=null;
+
+  function markEntryModals(){
+    document.querySelectorAll('.modal').forEach(function(m){
+      if(m.querySelector('form')){
+        m.dataset.kosolEntryModal='1';
+        // Prevent accidental backdrop/escape closure while filling a data-entry form.
+        // Successful CRUD handlers can still close it explicitly with Bootstrap's hide().
+        const inst=bootstrap?.Modal?.getOrCreateInstance(m,{backdrop:'static',keyboard:false});
+        if(inst){m.dataset.kosolStatic='1';}
+      }
+    });
+  }
+
+  function makeNoMatchClosable(box){
+    if(!box||box.dataset.kosolNoMatchBound==='1')return;
+    const text=String(box.textContent||'');
+    if(!NO_MATCH.test(text))return;
+    const existing=box.querySelector('.btn-close');
+    if(existing){
+      existing.setAttribute('aria-label','Close message');
+      existing.title='Close message';
+    }else{
+      const row=document.createElement('div');
+      row.className='kosol-inline-no-match';
+      const original=box.innerHTML;
+      box.innerHTML='';
+      const span=document.createElement('span');span.innerHTML=original;
+      const close=document.createElement('button');
+      close.type='button';close.className='btn-close';close.setAttribute('aria-label','Close message');close.title='Close message';
+      row.append(span,close);box.appendChild(row);
+    }
+    const close=box.querySelector('.btn-close');
+    close?.addEventListener('click',function(ev){
+      ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation?.();
+      box.classList.remove('show');box.style.display='none';box.dataset.kosolNoMatchDismissed='1';
+      if(noMatchTimer){clearTimeout(noMatchTimer);noMatchTimer=null;}
+    },true);
+    box.dataset.kosolNoMatchBound='1';
+    noMatchTimer=setTimeout(function(){
+      if(box.isConnected && NO_MATCH.test(box.textContent||'')){box.classList.remove('show');box.style.display='none';}
+    },4500);
+  }
+
+  function scanNoMatch(){
+    document.querySelectorAll('.search-option-list,.client-no-match,.cold-call-no-match,[role="status"]').forEach(makeNoMatchClosable);
+  }
+
+  // If a repeat entry is detected after a field change, keep the manually selectable
+  // Meeting/Visit Type, but default it to Follow Up for the next repeated activity.
+  function autoFollowUpForRepeat(formId, countId, typeId){
+    const form=document.getElementById(formId), count=document.getElementById(countId), type=document.getElementById(typeId);
+    if(!form||!count||!type)return;
+    const apply=function(){
+      const n=Number(count.value||1);
+      if(n>1 && !type.dataset.userSelected) type.value='Follow Up';
+    };
+    ['input','change'].forEach(ev=>count.addEventListener(ev,apply));
+    type.addEventListener('change',function(){type.dataset.userSelected='1';});
+    apply();
+  }
+
+  function installRepeatAutomation(){
+    autoFollowUpForRepeat('clientForm','cVisitCount','cVisitType');
+    autoFollowUpForRepeat('coldCallForm','ccVisitCount','ccVisitType');
+  }
+
+  // Successful CRUD result: close the currently active entry modal after the save
+  // confirmation has been displayed. Existing handlers may already hide it; this is
+  // a safe fallback for modules that did not previously do so.
+  function closeSavedEntryModal(title,message,type){
+    if(type!=='success')return;
+    if(!SAVE_WORDS.test(String(title||'')+' '+String(message||'')))return;
+    setTimeout(function(){
+      document.querySelectorAll('.modal.show[data-kosol-entry-modal="1"]').forEach(function(m){
+        if(m.dataset.closeApproved==='1')return;
+        try{bootstrap.Modal.getOrCreateInstance(m).hide();}catch(_){m.classList.remove('show');m.style.display='none';}
+      });
+    },350);
+  }
+
+  // Keep a reference to the existing function and wrap it without changing its normal
+  // notification behavior.
+  if(typeof window.showOperationMessage==='function' && !window.__kosolSaveCloseWrapped){
+    const original=window.showOperationMessage;
+    window.showOperationMessage=function(title,message,type,closeModals){
+      const result=original.apply(this,arguments);
+      closeSavedEntryModal(title,message,type);
+      return result;
+    };
+    window.__kosolSaveCloseWrapped=true;
+  }
+
+  const observer=new MutationObserver(function(){markEntryModals();scanNoMatch();});
+  function init(){markEntryModals();scanNoMatch();installRepeatAutomation();observer.observe(document.body,{childList:true,subtree:true});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 </body>
