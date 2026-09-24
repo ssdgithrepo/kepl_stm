@@ -446,6 +446,25 @@ main,.main-content,.content-area{min-width:0;max-width:100%;overflow-x:hidden}
   .mobile-navbar .navbar-nav{max-width:100%;overflow-x:hidden}
   .mobile-navbar .nav-link{white-space:normal}
 }
+/* Fixed navbar: the desktop side menu stays in place while the page content scrolls,
+   instead of scrolling away with it. The main content column gets matching left space
+   (via margin-left, since a fixed element is out of normal document flow) so nothing
+   renders underneath the menu. Mirrors Bootstrap's col-md-3 / col-lg-2 widths exactly. */
+@media (min-width:768px){
+  .sidebar{position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:1020;width:25%}
+  main.col-md-9{margin-left:25%!important}
+}
+@media (min-width:992px){
+  .sidebar{width:16.66666667%}
+  main.col-lg-10{margin-left:16.66666667%!important}
+}
+/* The mobile top bar already uses Bootstrap's sticky-top; make it a true fixed bar so it
+   stays put even inside scroll containers where sticky can silently fail, and reserve the
+   matching space at the top of the page content so nothing is hidden underneath it. */
+@media (max-width:767.98px){
+  .mobile-navbar{position:fixed!important;top:0;left:0;right:0;z-index:1030}
+  #mainAppLayout{padding-top:var(--kosol-mobile-navbar-h,64px)}
+}
 /* Avoid hover-only transforms on touch devices. */
 @media (hover:none){
   .card:hover,.modal-content:hover,.tree-card:hover,.chat-user:hover,.table-hover tbody tr:hover,.pipeline-card:hover{transform:none!important;box-shadow:inherit}
@@ -680,8 +699,17 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
 <style>
 .client-sales-entry-panel{border:1px solid #f0c36d;background:#fffaf0;border-radius:.55rem;padding:.75rem;margin-top:.25rem}.client-sales-entry-panel .form-control,.client-sales-entry-panel .form-select{background-color:#fff}.client-sales-entry-panel .bg-light{background:#f5f5f5!important}
 </style>
+
+<style id="kosol-data-loader-v3">
+#kosolDataRetryBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:1085;display:none;max-width:min(92vw,620px);box-shadow:0 10px 30px rgba(0,0,0,.16);border-radius:14px}
+#kosolDataRetryBar.show{display:flex}
+#kosolDataRetryBar .kosol-message-close{width:30px;height:30px;flex:0 0 30px;padding:0;border:0;background:transparent;color:#475569;display:inline-flex;align-items:center;justify-content:center;border-radius:50%}
+#kosolDataRetryBar .kosol-message-close:hover{background:rgba(15,23,42,.08)}
+</style>
 </head>
 <body>
+<div id="kosolDataRetryBar" class="alert alert-warning align-items-center gap-2 mb-0 py-2 px-3" role="alert"><span class="small flex-grow-1"><i class="bi bi-cloud-slash me-1"></i><b>Live data is not synchronized.</b> The database did not return the latest data.</span><button type="button" class="btn btn-sm btn-dark" onclick="retryCurrentDataLoad()"><i class="bi bi-arrow-clockwise me-1"></i>Retry</button><button type="button" class="kosol-message-close" aria-label="Close message" title="Close" onclick="closeDataRetryMessage()"><i class="bi bi-x-lg"></i></button></div>
+
 
 <div id="kosolWelcome" class="kosol-welcome d-none" aria-modal="true" role="dialog">
   <div class="kosol-welcome-card">
@@ -809,6 +837,10 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
               <div class="password-field-wrap w-100"><input type="password" id="loginPassword" class="form-control" required placeholder="••••••••" autocomplete="current-password"><button type="button" class="password-eye-inside" aria-label="Show password" onclick="togglePasswordVisibility('loginPassword','toggleLoginIcon')"><i class="bi bi-eye-slash" id="toggleLoginIcon"></i></button></div>
             </div>
           </div>
+          <div class="form-check mb-2">
+            <input type="checkbox" class="form-check-input" id="loginStayLoggedIn" checked>
+            <label class="form-check-label small" for="loginStayLoggedIn">Stay signed in on this device</label>
+          </div>
           <button type="submit" class="btn btn-primary w-100 py-2 fs-6">Sign In</button>
           
         </form>
@@ -898,7 +930,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       </div>
     </nav>
 
-    <div class="container-fluid">
+    <div class="container-fluid" id="mainAppLayout">
       <div class="row">
         
         <nav class="col-md-3 col-lg-2 d-none d-md-block sidebar p-3">
@@ -1052,7 +1084,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
                 </div>
                 <div class="table-responsive">
                   <table class="table table-hover align-middle small">
-                    <thead><tr><th>✓</th><th>Date</th><th>Organization Name</th><th>Client Name</th><th>State</th><th>Region</th><th>District</th><th>Tehsil</th><th>City / Village</th><th>Sales</th><th>Sales Order Repeat</th><th>Visit</th><th>Meeting</th></tr></thead>
+                    <thead><tr><th><input type="checkbox" class="form-check-input" id="dashboardClientSelectAll" onchange="toggleDashboardSelectAllTab('clients',this.checked)" title="Select all in this table"></th><th>Date</th><th>Organization Name</th><th>Client Name</th><th>State</th><th>Region</th><th>District</th><th>Tehsil</th><th>City / Village</th><th>Sales</th><th>Sales Order Repeat</th><th>Visit</th><th>Meeting</th></tr></thead>
                     <tbody id="dashboardHierarchyTable"></tbody>
                   </table>
                 </div>
@@ -1064,7 +1096,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
                   <small class="text-muted">Same dashboard filters + date period as the dashboard.</small>
                 </div>
                 <div class="table-responsive"><table class="table table-hover align-middle small">
-                  <thead><tr><th>✓</th><th>Date</th><th>Organization Name</th><th>Client Name</th><th>Mobile</th><th>State</th><th>Region</th><th>District</th><th>Outcome</th><th>Call</th><th>Lead</th><th>Remarks</th></tr></thead>
+                  <thead><tr><th><input type="checkbox" class="form-check-input" id="dashboardColdSelectAll" onchange="toggleDashboardSelectAllTab('coldcalls',this.checked)" title="Select all in this table"></th><th>Date</th><th>Organization Name</th><th>Client Name</th><th>Mobile</th><th>State</th><th>Region</th><th>District</th><th>Outcome</th><th>Call</th><th>Lead</th><th>Remarks</th></tr></thead>
                   <tbody id="dashboardColdCallTable"></tbody>
                 </table></div>
               </div>
@@ -1075,7 +1107,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
                   <small class="text-muted">Same dashboard filters + date period as the dashboard.</small>
                 </div>
                 <div class="table-responsive"><table class="table table-hover align-middle small">
-                  <thead><tr><th>✓</th><th>Date</th><th>Organization</th><th>Client</th><th>Order For</th><th>Sales Type</th><th>PV Type</th><th>DCR</th><th>N-DCR</th><th>PI Status</th><th>Amount</th></tr></thead>
+                  <thead><tr><th><input type="checkbox" class="form-check-input" id="dashboardSOSelectAll" onchange="toggleDashboardSelectAllTab('salesorders',this.checked)" title="Select all in this table"></th><th>Date</th><th>Organization</th><th>Client</th><th>Order For</th><th>Sales Type</th><th>PV Type</th><th>DCR</th><th>N-DCR</th><th>PI Status</th><th>Amount</th></tr></thead>
                   <tbody id="dashboardSalesOrderTable"></tbody>
                 </table></div>
               </div>
@@ -1756,10 +1788,35 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
   let lastSnapshotSavedAt = 0;
   const BACKGROUND_REFRESH_REASONS = new Set(['auto-poll','tab-visible','pageshow','cross-tab','online','focus']);
   const FRESH_FETCH_REASONS = new Set(['auto-poll','cross-tab','online','focus']);
-  const POLL_BASE_MS = 30000;      // check for changes every 30s while the tab is visible
-  const POLL_IDLE_MS = 60000;      // slow down after several unchanged checks
+  const POLL_BASE_MS = 45000;      // check for changes every 30s while the tab is visible
+  const POLL_IDLE_MS = 120000;      // slow down after several unchanged checks
   const POLL_MAX_MS = 180000;      // back-off ceiling after failures
   function quickHash(s){let h=5381,i=s.length;while(i)h=(h*33)^s.charCodeAt(--i);return (h>>>0).toString(36)+':'+s.length;}
+
+  // Performance: fingerprint only stable record identity/version fields instead of
+  // JSON-stringifying the complete dashboard snapshot on every background poll.
+  // The backend writes UpdatedAt for normal mutations, so this remains change-aware
+  // while avoiding a large serialization/GC pause on mobile browsers.
+  function fastDashboardFingerprint(data){
+    const groups=['clients','tasks','coldCalls','approvals','salesOrders','targets','notifications'];
+    let parts=[];
+    for(const group of groups){
+      const rows=Array.isArray(data?.[group])?data[group]:[];
+      parts.push(group+':'+rows.length);
+      for(let i=0;i<rows.length;i++){
+        const r=rows[i]||{};
+        const id=r.id??r.ID??r.clientId??r.taskId??r.orderId??r.notificationId??'';
+        const ver=r.updatedAt??r.UpdatedAt??r.createdAt??r.CreatedAt??r.timestamp??r.Timestamp??'';
+        parts.push(String(id)+'@'+String(ver));
+      }
+    }
+    const a=data?.todayAttendance||null;
+    parts.push('attendance:'+(a?.id??a?.ID??'')+'@'+(a?.updatedAt??a?.UpdatedAt??a?.timestamp??a?.Timestamp??''));
+    const users=Array.isArray(data?.teamUsers)?data.teamUsers:[];
+    parts.push('users:'+users.length);
+    for(const u of users){parts.push(String(u?.id??u?.ID??u?.email??u?.Email??'')+'@'+String(u?.updatedAt??u?.UpdatedAt??u?.status??u?.Status??''));}
+    return quickHash(parts.join('\u001f'));
+  }
 
   // Fast-start cache: show the last authenticated user's snapshot immediately,
   // then replace it atomically with the fresh backend snapshot in the background.
@@ -1881,6 +1938,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       // Always prefer the freshly issued server token. This prevents a stale
       // browser token from surviving a successful login.
       currentUser = Object.assign({}, res.user, { authToken: res.authToken || res.user.authToken || '' });
+      sessionUseLocalStorage=document.getElementById('loginStayLoggedIn')?.checked!==false;
       if(!currentUser.authToken){
         clearPersistedSession();
         currentUser=null;
@@ -1891,6 +1949,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       setupAppShell();
       allowPageExit=false;
       showUserSessionPopup('welcome');
+      setTimeout(syncMobileNavbarHeight,0);
     } else {
       closeOperationMessage();
       showOperationMessage('Login failed', res.message || 'Invalid credentials or unavailable backend.', 'error');
@@ -1973,13 +2032,14 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       document.getElementById('btnRefreshLocationMaster')?.classList.remove('d-none');
       // Do not compete with the initial dashboard request. Admin-only data is deferred.
       if(deferredAdminTimer) clearTimeout(deferredAdminTimer);
-      deferredAdminTimer=setTimeout(()=>{if(currentUser?.role==='Master Admin') fetchPendingUsers();},1200);
+      deferredAdminTimer=setTimeout(()=>{if(currentUser?.role==='Master Admin') fetchPendingUsers();},3200);
     }
 
     // Location master is needed by entry forms, not by the initial dashboard.
     // Load it after the dashboard has started so login feels immediate.
     scheduleDeferredLocationData();
-    touchUserActivity(); persistSession();
+    setTimeout(()=>{if(currentUser&&document.visibilityState==='visible')touchUserActivity();},1800);
+    persistSession();
     if(!userActivityTimer) userActivityTimer=setInterval(()=>{if(currentUser&&document.visibilityState==='visible'){touchUserActivity();persistSession();}},30000);
 
     // Paint the last valid snapshot first, then synchronize with backend.
@@ -2015,6 +2075,17 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       localStorage.setItem(DATA_CACHE_KEY,json);
     }catch(e){console.warn('Dashboard cache save skipped:',e);}
   }
+  let dashboardSnapshotSaveTimer=null;
+  function scheduleDashboardSnapshotSave(){
+    if(!currentUser)return;
+    if(dashboardSnapshotSaveTimer){
+      try{cancelIdleCallback(dashboardSnapshotSaveTimer);}catch(_){clearTimeout(dashboardSnapshotSaveTimer);}
+      dashboardSnapshotSaveTimer=null;
+    }
+    const work=()=>{dashboardSnapshotSaveTimer=null;try{saveDashboardSnapshotCache();}catch(e){console.warn('Dashboard snapshot save skipped:',e);}};
+    if('requestIdleCallback' in window){dashboardSnapshotSaveTimer=requestIdleCallback(work,{timeout:1800});}
+    else dashboardSnapshotSaveTimer=setTimeout(work,250);
+  }
   function restoreDashboardSnapshotCache(){
     if(dataCacheRestoreAttempted||!currentUser)return false;
     dataCacheRestoreAttempted=true;
@@ -2035,12 +2106,14 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     deferredLocationTimer=setTimeout(()=>{
       deferredLocationTimer=null;
       if(currentUser)loadLocationData();
-    },1200);
+    },3000);
   }
 
   function showDataSyncStatus(state,message){const ids=['dashboardSyncState','clientSyncState','salesSyncState'];ids.forEach(id=>{const e=document.getElementById(id);if(e){e.className='dashboard-sync-state '+state;e.innerHTML=state==='synced'?'<i class="bi bi-cloud-check"></i> Backend synchronized':state==='pending'?'<i class="bi bi-arrow-repeat"></i> Synchronizing…':'<i class="bi bi-exclamation-triangle"></i> Sync failed';e.title=message||'';}})}
   async function refreshData(options={}) {
     if(!currentUser) return false;
+    const refreshAge=Date.now()-Number(lastSuccessfulDataRefresh||0);
+    if(!options.force && options.reason!=='initial-load' && lastSuccessfulDataRefresh && refreshAge<2500 && !dataRefreshInFlight) return true;
     const isBackground=BACKGROUND_REFRESH_REASONS.has(options.reason);
     if(dataRefreshInFlight){
       // Background checks can simply be skipped. A user action / save must never be dropped:
@@ -2056,32 +2129,42 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     const silent=options.silent!==false;
     try{
       if(options.force===true) invalidateBackendReadCache();
+      // Keep the dashboard request deliberately small. The existing GS backend authenticates
+      // from email + authToken; territory arrays are not required by getDashboardData_.
+      // Sending only the fields actually consumed by the existing backend reduces request
+      // serialization time and avoids oversized payloads on mobile browsers.
       const dashboardPayload={
-        id:currentUser.id,email:currentUser.email,authToken:currentUser.authToken,
-        userId:currentUser.userId||currentUser.id,userRole:currentUser.role,userEmail:currentUser.email,
-        name:currentUser.name,role:currentUser.role,states:currentUser.states||[],regions:currentUser.regions||[],
-        districts:currentUser.districts||[],tehsils:currentUser.tehsils||[],cities:currentUser.cities||[],
-        pinCodes:currentUser.pinCodes||[],reportingManagers:currentUser.reportingManagers||[]
+        id:currentUser.id||currentUser.userId||'',
+        userId:currentUser.userId||currentUser.id||'',
+        email:currentUser.email||'',
+        userEmail:currentUser.email||'',
+        userRole:currentUser.role||'',
+        authToken:currentUser.authToken||''
       };
-      const res=await callBackendFast('getDashboardData',dashboardPayload,{fresh:FRESH_FETCH_REASONS.has(options.reason)});
+      // A dashboard snapshot must always be fetched from the current backend after login.
+      // Cached snapshots are for instant painting only, never the source of truth.
+      const mustFetchFresh = options.reason==='initial-load' || options.reason==='after-write' || options.force===true || FRESH_FETCH_REASONS.has(options.reason);
+      const res=await callBackendFast('getDashboardData',dashboardPayload,{fresh:mustFetchFresh});
       const payload=(res && res.data && typeof res.data==='object') ? res.data : res;
       if(!res || res.success===false || !payload){
         if(options.reason==='auto-poll') pollFailureCount++;
-        if(!silent) showOperationMessage('Dashboard refresh failed',res?.message||payload?.message||'Unable to load dashboard data.','error');
+        showDataSyncStatus('error',res?.message||payload?.message||'Unable to load dashboard data.');
+        if(!silent || options.reason==='initial-load') showOperationMessage('Data loading failed',res?.message||payload?.message||'Unable to load dashboard data.','error');
         return false;
       }
 
       // Replace the complete client-side snapshot atomically so every module
       // renders from the same server response.
-      rawData.clients=Array.isArray(res.clients)?res.clients:[];
-      rawData.tasks=Array.isArray(res.tasks)?res.tasks:[];
-      rawData.coldCalls=Array.isArray(res.coldCalls)?res.coldCalls:[];
-      rawData.salesOrders=Array.isArray(res.salesOrders)?res.salesOrders:loadLocalSalesOrders();
-      rawData.targets=Array.isArray(res.targets)?res.targets:[];
-      rawData.notifications=Array.isArray(res.notifications)?res.notifications:[];
-      rawData.approvals=Array.isArray(res.approvals)?res.approvals:[];
-      rawData.todayAttendance=res.todayAttendance||null;
-      rawData.teamUsers=Array.isArray(res.teamUsers)?res.teamUsers:[];
+      rawData.clients=Array.isArray(payload.clients)?payload.clients:rawData.clients;
+      rawData.tasks=Array.isArray(payload.tasks)?payload.tasks:rawData.tasks;
+      rawData.coldCalls=Array.isArray(payload.coldCalls)?payload.coldCalls:rawData.coldCalls;
+      rawData.salesOrders=Array.isArray(payload.salesOrders)?payload.salesOrders:rawData.salesOrders;
+      rawData.targets=Array.isArray(payload.targets)?payload.targets:rawData.targets;
+      rawData.notifications=Array.isArray(payload.notifications)?payload.notifications:rawData.notifications;
+      rawData.approvals=Array.isArray(payload.approvals)?payload.approvals:rawData.approvals;
+      if(Object.prototype.hasOwnProperty.call(payload,'todayAttendance')) rawData.todayAttendance=payload.todayAttendance||null;
+      rawData.teamUsers=Array.isArray(payload.teamUsers)?payload.teamUsers:rawData.teamUsers;
+      if(!Array.isArray(rawData.salesOrders)) rawData.salesOrders=loadLocalSalesOrders();
       allUsersList=rawData.teamUsers.slice();
       // Records saved earlier with the logged-in user's e-mail as the "client e-mail" are shown blank.
       // Only done when another owner field exists, so ownership matching is unaffected.
@@ -2094,15 +2177,12 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         };
         rawData.clients.forEach(fix); rawData.coldCalls.forEach(fix);
       }catch(e){}
-      const teamSignature=quickHash(JSON.stringify(rawData.teamUsers.map(u=>[u&&u.id,u&&u.name,u&&u.role,u&&u.status])));
+      const teamSignature=quickHash(rawData.teamUsers.map(u=>[u&&u.id,u&&u.name,u&&u.role,u&&u.status]).join('\u001f'));
       if(!isBackground || teamSignature!==lastTeamSignature){ try{refreshReportingManagerSelectors();}catch(e){} }
       lastTeamSignature=teamSignature;
       // Fingerprint covers every record field of every module (tasks and approvals included),
       // so any edit made by any user is detected and re-rendered without a manual page refresh.
-      const fingerprint=quickHash(JSON.stringify([
-        rawData.clients,rawData.tasks,rawData.coldCalls,rawData.approvals,rawData.salesOrders,
-        rawData.targets,rawData.notifications,rawData.todayAttendance
-      ]));
+      const fingerprint=fastDashboardFingerprint(rawData);
       const dataChanged=fingerprint!==lastDataFingerprint;
       lastDataFingerprint=fingerprint;
       if(options.reason==='auto-poll'){ pollFailureCount=0; pollUnchangedCount=dataChanged?0:pollUnchangedCount+1; }
@@ -2113,7 +2193,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       salesOrderRepeatMapCache=new Map();
       // Serialising the whole snapshot is expensive: only do it when something changed
       // (or every 5 minutes to keep the fast-start cache timestamp fresh).
-      if(dataChanged || Date.now()-lastSnapshotSavedAt>300000){ saveDashboardSnapshotCache(); lastSnapshotSavedAt=Date.now(); }
+      if(dataChanged || Date.now()-lastSnapshotSavedAt>300000){ scheduleFastSnapshotSave(); lastSnapshotSavedAt=Date.now(); }
       const shouldRender=!isBackground || dataChanged || !lastSuccessfulDataRefresh;
       // Notifications for every module (follow-ups, tasks, approvals, sales orders, targets, attendance)
       // are recalculated from the fresh snapshot; the bell badge updates automatically.
@@ -2142,6 +2222,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       return true;
     }catch(err){
       console.error('refreshData failed:',err);
+      showDataSyncStatus('error',err?.message||String(err));
       if(options.reason==='auto-poll') pollFailureCount++;
       if(!silent) showOperationMessage('Data refresh failed',err.message||String(err),'error');
       return false;
@@ -2154,6 +2235,13 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       }
     }
   }
+
+  function retryCurrentDataLoad(){
+    if(!currentUser)return false;
+    invalidateBackendReadCache();
+    return refreshData({silent:false,reason:'manual-retry',force:true});
+  }
+  window.retryCurrentDataLoad=retryCurrentDataLoad;
 
   function updateLiveSyncIndicator(){
     const el=document.getElementById('liveDataStatus');
@@ -2185,14 +2273,69 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     },nextPollDelay());
   }
 
+  // Persistent fast-start cache: IndexedDB avoids localStorage's small quota and keeps a
+  // complete dashboard snapshot across page reloads without blocking the main UI thread.
+  const KOSOL_IDB_NAME='KOSOL_FAST_CACHE_V2';
+  const KOSOL_IDB_STORE='snapshots';
+  const KOSOL_IDB_MAX_AGE=30*60*1000;
+  let kosolIdbPromise=null;
+  function kosolOpenIdb(){
+    if(kosolIdbPromise)return kosolIdbPromise;
+    kosolIdbPromise=new Promise((resolve,reject)=>{
+      try{
+        if(!window.indexedDB){reject(new Error('IndexedDB unavailable'));return;}
+        const req=indexedDB.open(KOSOL_IDB_NAME,1);
+        req.onupgradeneeded=()=>{try{if(!req.result.objectStoreNames.contains(KOSOL_IDB_STORE))req.result.createObjectStore(KOSOL_IDB_STORE);}catch(e){}};
+        req.onsuccess=()=>resolve(req.result); req.onerror=()=>reject(req.error||new Error('IndexedDB open failed'));
+      }catch(e){reject(e)}
+    }).catch(e=>{kosolIdbPromise=null;throw e;});
+    return kosolIdbPromise;
+  }
+  function kosolIdbGet(key){return kosolOpenIdb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(KOSOL_IDB_STORE,'readonly');const req=tx.objectStore(KOSOL_IDB_STORE).get(key);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error);}));}
+  function kosolIdbPut(key,value){return kosolOpenIdb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(KOSOL_IDB_STORE,'readwrite');tx.objectStore(KOSOL_IDB_STORE).put(value,key);tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error);}));}
+  function kosolIdbDelete(key){return kosolOpenIdb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(KOSOL_IDB_STORE,'readwrite');tx.objectStore(KOSOL_IDB_STORE).delete(key);tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error);}));}
+  function kosolIdbUserKey(){return 'dashboard:'+cacheUserKey(currentUser);}
+  async function saveDashboardIndexedSnapshot(){
+    if(!currentUser)return;
+    try{await kosolIdbPut(kosolIdbUserKey(),{version:2,savedAt:Date.now(),userKey:cacheUserKey(currentUser),data:snapshotForCache().data});}
+    catch(e){console.warn('IndexedDB dashboard cache save skipped:',e);}
+  }
+  async function restoreDashboardIndexedSnapshot(){
+    if(!currentUser)return false;
+    try{
+      const saved=await kosolIdbGet(kosolIdbUserKey());
+      if(!saved||saved.version!==2||saved.userKey!==cacheUserKey(currentUser)||Date.now()-Number(saved.savedAt||0)>KOSOL_IDB_MAX_AGE)return false;
+      // Never overwrite fresher server data.
+      if(lastSuccessfulDataRefresh && lastSuccessfulDataRefresh>=Number(saved.savedAt||0))return false;
+      const d=saved.data||{};
+      let usable=false;
+      Object.keys(rawData).forEach(k=>{if(Object.prototype.hasOwnProperty.call(d,k)){rawData[k]=d[k];usable=usable||Array.isArray(d[k])||(k==='todayAttendance'&&d[k]);}});
+      if(Array.isArray(rawData.teamUsers)&&rawData.teamUsers.length)allUsersList=rawData.teamUsers.slice();
+      if(!usable)return false;
+      lastSuccessfulDataRefresh=Number(saved.savedAt||0);
+      showDataSyncStatus('pending','Showing the last local snapshot while fresh backend data loads.');
+      try{applyDashboardFilters();}catch(e){}
+      return true;
+    }catch(e){return false;}
+  }
+  function scheduleFastSnapshotSave(){
+    // Keep the existing localStorage cache for compatibility and add IndexedDB for large datasets.
+    scheduleDashboardSnapshotSave();
+    if(window.requestIdleCallback) requestIdleCallback(()=>saveDashboardIndexedSnapshot(),{timeout:2500});
+    else setTimeout(saveDashboardIndexedSnapshot,400);
+  }
+
   function startLiveDataSync(opts){
-    // Load the snapshot immediately, then keep it current in the background while the tab is
-    // visible: changes made by any user (or in another tab/device) appear automatically.
+    // Show any locally cached authenticated snapshot first, then ALWAYS synchronize with the existing
+    // Google Apps Script backend. IndexedDB restoration is asynchronous and does not block login.
     stopLiveDataSync();
     if(!currentUser) return;
     pollUnchangedCount=0; pollFailureCount=0;
-    if(!opts || opts.immediate!==false) refreshData({silent:true,reason:'initial-load',force:false});
-    scheduleNextPoll();
+    const begin=()=>{
+      if(!opts || opts.immediate!==false) refreshData({silent:true,reason:'initial-load',force:true});
+      scheduleNextPoll();
+    };
+    restoreDashboardIndexedSnapshot().then(begin,begin);
   }
 
   function stopLiveDataSync(){
@@ -2204,7 +2347,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
 
   window.addEventListener('online',()=>{ if(currentUser) refreshData({silent:true,reason:'online'}); });
   window.addEventListener('focus',()=>{
-    if(currentUser && document.visibilityState==='visible' && Date.now()-lastSuccessfulDataRefresh>20000) refreshData({silent:true,reason:'focus'});
+    if(currentUser && document.visibilityState==='visible' && Date.now()-lastSuccessfulDataRefresh>60000) refreshData({silent:true,reason:'focus'});
   });
 
   // Cross-tab notification: a save in one tab refreshes every other open tab immediately.
@@ -2986,7 +3129,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
       pinCode: getSelectOrOther('ccPinCode') || getVal('ccPinManual'), address: getVal('ccAddress'), reasonForNoVisit: getVal('ccReason'), callStatus: getSelectOrOther('ccCallStatus'),
       callOutcome: getSelectOrOther('ccOutcome'), leadTemp: getSelectOrOther('ccLeadTemp'),
       requirements: getVal('ccRequirements'), remarks: getVal('ccRemarks'),
-      entryDate: getVal('ccEntryDate')
+      entryDate: getVal('ccEntryDate'), activityDate: getVal('ccEntryDate')
     };
     const res = await callBackend(payload.id ? 'updateColdCall' : 'saveColdCall', payload);
     if(res.success) {
@@ -3585,7 +3728,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         tehsil:getSelectOrOther('cTehsil'),city:getSelectOrOther('cCityVillage'),pinCode:getSelectOrOther('cPinCode')||getVal('cPinManual'),address:getVal('cAddress'),
         salesOrderStatus:getSelectOrOther('cSalesOrderStatus')||'In Pipeline',salesType:getSelectOrOther('cSalesType'),leadTemp:getSelectOrOther('cLeadTemp'),
         visitType:getSelectOrOther('cVisitType'),visitCount:computedVisitCount,visitStatus:getSelectOrOther('cVisitStatus'),meetingStatus:getSelectOrOther('cMeetingStatus'),callStatus:getSelectOrOther('cCallStatus'),
-        entryDate:getVal('cEntryDate'),nextFollowUpDate:getVal('cNextFollowUpDate'),requirements:getVal('cRequirements'),remarks:getVal('cRemarks'),locationImageData:imageData
+        entryDate:getVal('cEntryDate'),activityDate:getVal('cEntryDate'),nextFollowUpDate:getVal('cNextFollowUpDate'),requirements:getVal('cRequirements'),remarks:getVal('cRemarks'),locationImageData:imageData
       };
 
       const salesDone=String(payload.salesOrderStatus).trim().toLowerCase()==='done';
@@ -4003,6 +4146,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
   }
 
   let dashboardDirectoryLoadPromise=null;
+  let dashboardDirectoryLoadedAt=0;
   async function ensureDashboardUserDirectory(){
     if(!currentUser)return [];
     if(dashboardDirectoryLoadPromise)return dashboardDirectoryLoadPromise;
@@ -4011,6 +4155,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
         const r=await callBackendFast('getAllUsersDirectory',currentUser||{});
         if(r?.success && Array.isArray(r.users) && r.users.length){
           allUsersList=r.users.slice();
+          dashboardDirectoryLoadedAt=Date.now();
           try{renderDashboardUserFilters();}catch(e){console.warn('Dashboard user filter refresh failed',e);}
         }
       }catch(e){
@@ -4057,7 +4202,7 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
 
   function renderDashboardUserFilters(){
     const box=document.getElementById('dashboardUserFilters'); if(!box)return;
-    if(currentUser && !dashboardDirectoryLoadPromise) setTimeout(()=>ensureDashboardUserDirectory(),0);
+    if(currentUser && !dashboardDirectoryLoadPromise && Date.now()-dashboardDirectoryLoadedAt>300000) setTimeout(()=>ensureDashboardUserDirectory(),0);
     const previousState=document.getElementById('dashboardStateFilter')?.value||'ALL';
     const previousUser=document.getElementById('dashboardUserFilter')?.value||'ALL';
     const users=dashboardEligibleUsers();
@@ -4076,13 +4221,14 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     }
 
     const isHead=(currentUser.role==='Master Admin'||currentUser.role==='Admin'||/head/i.test(String(currentUser.role||'')));
-    // IMPORTANT: For Heads, build the selectable user list directly from the
-    // complete backend user directory and resolve membership only through the
-    // reporting-manager graph. Do not first restrict the directory by the
-    // dashboard's territory/data scope, otherwise indirect reports can disappear.
+    // Reporting managers must get the complete reporting hierarchy from the
+    // user directory, not only the users present in the current dashboard
+    // snapshot. This keeps every direct/indirect team member available for
+    // name selection.
+    const directory=(Array.isArray(allUsersList)&&allUsersList.length)?allUsersList:users;
     const team=isHead
-      ? dashboardHeadTeam(currentUser,allUsersList||[])
-      : dashboardTeamMembers(currentUser,users);
+      ? dashboardHeadTeam(currentUser,directory)
+      : dashboardTeamMembers(currentUser,directory);
     // The signed-in user must also be selectable. Keep the existing team
     // membership rules unchanged; this only adds the current user as an
     // explicit dashboard selection so every user can inspect their own data.
@@ -4092,10 +4238,12 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     const buildOptions=st=>{
       const filtered=selectableUsers.filter(u=>st==='ALL'||dashboardFieldAllows(u,'states',st));
       const out=[];
-      // Keep "User: All" as the first option. For Heads, the existing
-      // team-all option remains available, followed by the signed-in user and
-      // the direct/indirect reporting team members.
-      if(isHead && team.filter(u=>st==='ALL'||dashboardFieldAllows(u,'states',st)).length) out.push({value:'TEAM:ALL',text:'All Team User Data ('+team.filter(u=>st==='ALL'||dashboardFieldAllows(u,'states',st)).length+' Users)'});
+      // Keep "User: All" as the first option. Whenever the signed-in user
+      // has a reporting hierarchy, expose an explicit Team selection as well.
+      // This applies to Reporting Manager/Manager roles even when their role
+      // name does not contain the word "Head".
+      const visibleTeam=team.filter(u=>st==='ALL'||dashboardFieldAllows(u,'states',st));
+      if(visibleTeam.length) out.push({value:'TEAM:ALL',text:'All Team User Data ('+visibleTeam.length+' Users)'});
       // The current user is deliberately placed first after the team-all
       // option, so "My Data" is immediately available by name.
       const selfId=String(currentUser?.id||currentUser?.userId||currentUser?.email||currentUser?.name||'');
@@ -4140,39 +4288,71 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     if(stateSel)stateSel.value=[...stateSel.options].some(o=>o.value===previousState)?previousState:'ALL';
     nameSel.innerHTML='<option value="ALL">User: All</option>'+buildOptions(stateSel?.value||'ALL').map(x=>'<option value="'+escapeAttr(x.value)+'">'+escapeHtml(x.text)+'</option>').join('');
 
-    const wanted=(isHead && (previousUser==='ALL'||previousUser==='TEAM:ALL'))?'TEAM:ALL':previousUser;
+    const hasTeam=team.length>0;
+    const wanted=((hasTeam||isHead) && (previousUser==='ALL'||previousUser==='TEAM:ALL'))?'TEAM:ALL':previousUser;
     nameSel.value=[...nameSel.options].some(o=>o.value===wanted)?wanted:'ALL';
 
     stateSel?.addEventListener('change',()=>{
       nameSel.innerHTML='<option value="ALL">User: All</option>'+buildOptions(stateSel.value||'ALL').map(x=>'<option value="'+escapeAttr(x.value)+'">'+escapeHtml(x.text)+'</option>').join('');
-      const wantedAfterState=(isHead&&previousUser!=='ALL'&&previousUser!=='TEAM:ALL'&&[...nameSel.options].some(o=>o.value===previousUser))?previousUser:(isHead&&buildOptions(stateSel.value||'ALL').some(o=>o.value==='TEAM:ALL')?'TEAM:ALL':'ALL');
+      const wantedAfterState=((hasTeam||isHead)&&previousUser!=='ALL'&&previousUser!=='TEAM:ALL'&&[...nameSel.options].some(o=>o.value===previousUser))?previousUser:((hasTeam||isHead)&&buildOptions(stateSel.value||'ALL').some(o=>o.value==='TEAM:ALL')?'TEAM:ALL':'ALL');
       nameSel.value=wantedAfterState;
       scheduleDashboardFilterRender();
     });
-    nameSel.addEventListener('change',applyDashboardFilters);
+    nameSel.addEventListener('change',applyDashboardFiltersLight);
   }
+  // Returns exactly the people that the signed-in user is allowed to choose in
+  // the dashboard name filter: the signed-in user plus every direct/indirect
+  // reporting member.  This is intentionally based on the reporting hierarchy,
+  // not merely on shared state/region/territory.
+  function dashboardSelectableUsersForCurrentUser(){
+    const me=currentUser||{};
+    const users=Array.isArray(allUsersList)&&allUsersList.length ? allUsersList : dashboardEligibleUsers();
+    const isHead=me.role==='Master Admin'||me.role==='Admin'||/head/i.test(String(me.role||''));
+    const team=isHead ? dashboardHeadTeam(me,users) : dashboardTeamMembers(me,users);
+    const out=[me];
+    const seen=new Set();
+    const identity=u=>[u?.id,u?.userId,u?.employeeId,u?.email,u?.name,u?.loginId,u?.username]
+      .filter(v=>v!==undefined&&v!==null&&String(v).trim()!=='').map(dashboardNorm);
+    identity(me).forEach(k=>seen.add(k));
+    team.forEach(u=>{
+      if(!u)return;
+      const keys=identity(u);
+      if(keys.some(k=>seen.has(k)))return;
+      keys.forEach(k=>seen.add(k));
+      out.push(u);
+    });
+    return {isHead,team,out};
+  }
+
   function dashboardUserPasses(item){
     const uf=document.getElementById('dashboardUserFilter')?.value||'ALL';
     const sf=document.getElementById('dashboardStateFilter')?.value||'ALL';
-    const users=dashboardEligibleUsers();
-    const team=dashboardTeamMembers(currentUser,users);
-    const selectableUsers=[currentUser,...team.filter(u=>!dashboardOwnerMatches(u,currentUser))];
-    const selected=uf==='ALL'||uf==='TEAM:ALL'?null:selectableUsers.find(u=>String(u.id||u.userId||u.email||u.name)===String(uf));
+    const scope=dashboardSelectableUsersForCurrentUser();
+    const team=scope.team;
+    const selectableUsers=scope.out;
+    const sameKey=u=>String(u?.id||u?.userId||u?.email||u?.name||'')===String(uf);
+    const selected=uf==='ALL'||uf==='TEAM:ALL'?null:selectableUsers.find(sameKey);
+
     if(sf!=='ALL'&&!dashboardFieldAllows(currentUser,'states',sf))return false;
     if(sf!=='ALL'){
       const itemState=item?.state??item?.State;
       if(itemState!==undefined&&!dashboardFieldAllows({states:[sf]},itemState))return false;
     }
-    // TEAM:ALL is strictly the reporting-manager team: direct + indirect members only.
-    // A record must belong to one of those users; shared territory alone never
-    // makes an unrelated user's record visible.
-    if(uf==='TEAM:ALL'){
-      return team.some(u=>dashboardOwnerMatches(item,u));
-    }
-    if(!selected)return true;
-    // Individual selection is also strictly owner-based, while territory
-    // authorization remains available to the rest of the dashboard scope logic.
-    return dashboardOwnerMatches(item,selected);
+
+    // For a reporting manager, "All Team User Data" means ONLY the manager's
+    // own direct/indirect reporting tree.  It never exposes another manager's
+    // records merely because the territory is shared.
+    if(uf==='TEAM:ALL')return team.some(u=>dashboardOwnerMatches(item,u));
+
+    // For the explicit name selection, match the selected person's own records
+    // only.  This makes the name dropdown deterministic and prevents records
+    // from being mixed in from related users.
+    if(selected)return dashboardOwnerMatches(item,selected);
+
+    // "User: All" is scoped to the people this user is permitted to inspect.
+    // For a non-head this therefore means self + reporting team, rather than
+    // accidentally showing every record in the backend snapshot.
+    return selectableUsers.some(u=>dashboardOwnerMatches(item,u));
   }
 
   // Dashboard renderer: keeps KPI cards and Chart.js visuals in sync with the
@@ -4200,10 +4380,12 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     return all.filter(o=>ids.includes(String(o.id||o.orderId||o.ID||'')));
   }
   function renderDashboardSalesOrderTable(s){
-    const orders=s.salesOrders||[];const count=document.getElementById('dashboardSalesTabCount');if(count)count.textContent=String(orders.length);const panelCount=document.getElementById('dashboardSalesPanelCount');if(panelCount)panelCount.textContent=String(orders.length);
+    const orders=s.salesOrders||[];
+const count=document.getElementById('dashboardSalesTabCount');if(count)count.textContent=String(orders.length);const panelCount=document.getElementById('dashboardSalesPanelCount');if(panelCount)panelCount.textContent=String(orders.length);
     const fmt=(o,fn)=>{const x=fn(o);return x.qty?`${x.qty.toLocaleString('en-IN')} panels / ${x.kw.toFixed(3)} kW`:'—'};
     const sot=document.getElementById('dashboardSalesOrderTable');
-    if(sot)sot.innerHTML=orders.length?orders.slice().reverse().map(o=>{const oid=String(o.id||o.orderId||o.ID||'');const key='SO:'+oid;const checked=selectedDashboardIds.has(key)?'checked':'';return `<tr class="${checked?'dashboard-row-selected':''}"><td><input type="checkbox" class="form-check-input dashboard-record-check" data-record-type="salesorder" data-record-id="${escapeAttr(oid)}" ${checked} onchange="toggleDashboardSelection('SO:${escapeAttr(oid)}',this.checked)" /></td><td>${escapeHtml(dashboardDateKey(o.date||o.entryDate))}</td><td>${escapeHtml(o.orgName||o.organization||'')}</td><td>${escapeHtml(o.clientName||'')}</td><td>${escapeHtml(o.orderFor||'')}</td><td>${escapeHtml(o.salesType||'')}</td><td>${escapeHtml(o.pvType||o.PVType||'-')}</td><td>${escapeHtml(fmt(o,dcrValForDashboard))}</td><td>${escapeHtml(fmt(o,ndcrValForDashboard))}</td><td>${escapeHtml(o.piStatus||'')}</td><td>${escapeHtml(salesOrderMoney(o.amount))}</td></tr>`}).join(''):'<tr><td colspan="11" class="text-center text-muted">No sales orders in the selected scope.</td></tr>';
+    if(sot)sot.innerHTML=orders.length?orders.slice().reverse().map(o=>{const oid=String(o.id||o.orderId||o.ID||'');const key='SO:'+oid;const checked=selectedDashboardIds.has(key)?'checked':'';return `<tr class="${checked?'dashboard-row-selected':''}"><td><input type="checkbox" class="form-check-input dashboard-record-check" data-record-type="salesorder" data-record-id="${escapeAttr(oid)}" data-dash-key="SO:${escapeAttr(oid)}" ${checked} onchange="toggleDashboardSelection('SO:${escapeAttr(oid)}',this.checked)" /></td><td>${escapeHtml(dashboardDateKey(o.date||o.entryDate))}</td><td>${escapeHtml(o.orgName||o.organization||'')}</td><td>${escapeHtml(o.clientName||'')}</td><td>${escapeHtml(o.orderFor||'')}</td><td>${escapeHtml(o.salesType||'')}</td><td>${escapeHtml(o.pvType||o.PVType||'-')}</td><td>${escapeHtml(fmt(o,dcrValForDashboard))}</td><td>${escapeHtml(fmt(o,ndcrValForDashboard))}</td><td>${escapeHtml(o.piStatus||'')}</td><td>${escapeHtml(salesOrderMoney(o.amount))}</td></tr>`}).join(''):'<tr><td colspan="11" class="text-center text-muted">No sales orders in the selected scope.</td></tr>';
+      syncDashboardSelectAllHeader('salesorders','dashboardSOSelectAll');
   }
   function dashboardPvType(o){return String(o?.pvType??o?.PVType??o?.pv_type??o?.PvType??'').trim().toLowerCase().replace(/\s+/g,'');}
   function dashboardNumField(o,names){for(const n of names){const v=o?.[n];if(v!==undefined&&v!==null&&String(v).trim()!=='')return salesOrderNum(v);}return 0;}
@@ -4240,6 +4422,17 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     const coldEl=document.getElementById('statColdCalls'); if(coldEl)coldEl.textContent=String(calls.length||0);
   }
 
+  // Re-filters and re-renders without rebuilding the State/User dropdowns - used when only the
+  // User filter changed, so the on-screen data updates immediately as soon as a selection is made.
+  function applyDashboardFiltersLight(){
+    const filterType=document.getElementById('dateFilterType').value;
+    const datePass=d=>{if(!d)return true;const key=appDateOnly(d),today=appToday();if(!key)return false;if(filterType==='DAILY')return key===today;const n=appDateNumber(key),nowN=appDateNumber(today);if(filterType==='WEEKLY'){const day=new Date(nowN).getUTCDay()||7,startN=nowN-(day-1)*86400000;return n>=startN&&n<=nowN;}if(filterType==='MONTHLY'){const d1=new Date(nowN);return new Date(key).getUTCFullYear()===d1.getUTCFullYear()&&new Date(key).getUTCMonth()===d1.getUTCMonth();}if(filterType==='CUSTOM'){const s=document.getElementById('startDateFilter').value,e=document.getElementById('endDateFilter').value;if(s&&n<appDateNumber(s))return false;if(e&&n>appDateNumber(e))return false;return true;}return true;};
+    filteredClients=(rawData.clients||[]).filter(item=>datePass(item.activityDate||item.entryDate)&&dashboardUserPasses(item));
+    try{renderDashboardCharts();}catch(e){console.error('Dashboard chart/KPI render failed:',e);}
+    try{renderDashboardTable();}catch(e){console.error('Dashboard table render failed:',e);}
+    try{renderDashboardColdCalls();}catch(e){console.error('Dashboard cold-call render failed:',e);}
+    try{renderDashboardSalesOrderTable(dashboardStats());}catch(e){}
+  }
   function applyDashboardFilters() {
     const filterType=document.getElementById('dateFilterType').value, now=new Date();
     const startCustom=document.getElementById('startDateFilter').value, endCustom=document.getElementById('endDateFilter').value;
@@ -4255,8 +4448,9 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
   function renderDashboardColdCalls(){
     const count=document.getElementById('dashboardColdTabCount');if(count)count.textContent=String(currentDashboardColdCalls().length);
     const tbody=document.getElementById('dashboardColdCallTable');if(!tbody)return;tbody.innerHTML='';const list=(rawData.coldCalls||[]).filter(c=>dashboardDatePasses(c.activityDate||c.entryDate||c.timestamp)&&dashboardUserPasses(c));
-    if(!list.length){tbody.innerHTML='<tr><td colspan="12" class="text-center text-muted py-3">No cold-call activity for the selected period.</td></tr>';return;}
-    list.forEach(c=>{const key='CC:'+c.id,checked=selectedDashboardIds.has(key)?'checked':'';tbody.insertAdjacentHTML('beforeend',`<tr class="${checked?'dashboard-row-selected':''}"><td><input class="form-check-input" type="checkbox" ${checked} onchange="toggleDashboardSelection('CC:${escapeAttr(c.id)}',this.checked)"></td><td>${escapeHtml(c.timestamp||c.entryDate||'')}</td><td>${escapeHtml(c.orgName||c.clientName||'')}</td><td>${escapeHtml(c.contactName||'')}</td><td>${escapeHtml(c.phone||'')}</td><td>${escapeHtml(c.state||'')}</td><td>${escapeHtml(c.region||'')}</td><td>${escapeHtml(c.district||'')}</td><td>${escapeHtml(c.outcome||'')}</td><td>${escapeHtml(c.callStatus||'')}</td><td>${escapeHtml(c.leadTemp||'')}</td><td>${escapeHtml(c.remarks||'')}</td></tr>`);});
+    if(!list.length){tbody.innerHTML='<tr><td colspan="12" class="text-center text-muted py-3">No cold-call activity for the selected period.</td></tr>';syncDashboardSelectAllHeader('coldcalls','dashboardColdSelectAll');return;}
+    list.forEach(c=>{const key='CC:'+c.id,checked=selectedDashboardIds.has(key)?'checked':'';tbody.insertAdjacentHTML('beforeend',`<tr class="${checked?'dashboard-row-selected':''}"><td><input class="form-check-input" type="checkbox" data-dash-key="CC:${escapeAttr(c.id)}" ${checked} onchange="toggleDashboardSelection('CC:${escapeAttr(c.id)}',this.checked)"></td><td>${escapeHtml(c.timestamp||c.entryDate||'')}</td><td>${escapeHtml(c.orgName||c.clientName||'')}</td><td>${escapeHtml(c.contactName||'')}</td><td>${escapeHtml(c.phone||'')}</td><td>${escapeHtml(c.state||'')}</td><td>${escapeHtml(c.region||'')}</td><td>${escapeHtml(c.district||'')}</td><td>${escapeHtml(c.outcome||'')}</td><td>${escapeHtml(c.callStatus||'')}</td><td>${escapeHtml(c.leadTemp||'')}</td><td>${escapeHtml(c.remarks||'')}</td></tr>`);});
+      syncDashboardSelectAllHeader('coldcalls','dashboardColdSelectAll');
   }
   let salesOrderRepeatMapCacheKey='';
   let salesOrderRepeatMapCache=new Map();
@@ -4280,16 +4474,63 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
   }
   function renderDashboardTable(){
     const count=document.getElementById('dashboardClientTabCount');if(count)count.textContent=String((filteredClients||[]).length);
-    const tbody=document.getElementById('dashboardHierarchyTable');if(!tbody)return;tbody.innerHTML='';filteredClients.forEach(c=>{const key='CL:'+c.id,checked=selectedDashboardIds.has(key)?'checked':'',repeat=salesOrderRepeatCountForClient(c);tbody.insertAdjacentHTML('beforeend',`<tr class="${checked?'dashboard-row-selected':''}"><td><input class="form-check-input" type="checkbox" ${checked} onchange="toggleDashboardSelection('CL:${escapeAttr(c.id)}',this.checked)"></td><td>${escapeHtml(c.activityDate||c.entryDate||'')}</td><td class="fw-bold">${escapeHtml(c.orgName||c.organization||c.organizationName||'')}</td><td class="fw-semibold">${escapeHtml(c.contactName||c.clientName||'')}</td><td>${escapeHtml(c.state||'')}</td><td>${escapeHtml(c.region||'')}</td><td>${escapeHtml(c.district||'')}</td><td>${escapeHtml(c.tehsil||'')}</td><td><strong>${escapeHtml(c.city||'')}</strong></td><td>${escapeHtml(c.salesOrderStatus||'')}</td><td><span class="badge ${repeat>1?'text-bg-success':'text-bg-light'}">${repeat||'—'}</span></td><td>${escapeHtml(c.visitStatus||'')}</td><td>${escapeHtml(c.meetingStatus||'')}</td></tr>`);});updateSelectionCount();
+    const tbody=document.getElementById('dashboardHierarchyTable');if(!tbody)return;tbody.innerHTML='';filteredClients.forEach(c=>{const key='CL:'+c.id,checked=selectedDashboardIds.has(key)?'checked':'',repeat=salesOrderRepeatCountForClient(c);tbody.insertAdjacentHTML('beforeend',`<tr class="${checked?'dashboard-row-selected':''}"><td><input class="form-check-input" type="checkbox" data-dash-key="CL:${escapeAttr(c.id)}" ${checked} onchange="toggleDashboardSelection('CL:${escapeAttr(c.id)}',this.checked)"></td><td>${escapeHtml(c.activityDate||c.entryDate||'')}</td><td class="fw-bold">${escapeHtml(c.orgName||c.organization||c.organizationName||'')}</td><td class="fw-semibold">${escapeHtml(c.contactName||c.clientName||'')}</td><td>${escapeHtml(c.state||'')}</td><td>${escapeHtml(c.region||'')}</td><td>${escapeHtml(c.district||'')}</td><td>${escapeHtml(c.tehsil||'')}</td><td><strong>${escapeHtml(c.city||'')}</strong></td><td>${escapeHtml(c.salesOrderStatus||'')}</td><td><span class="badge ${repeat>1?'text-bg-success':'text-bg-light'}">${repeat||'—'}</span></td><td>${escapeHtml(c.visitStatus||'')}</td><td>${escapeHtml(c.meetingStatus||'')}</td></tr>`);});updateSelectionCount();
+      syncDashboardSelectAllHeader('clients','dashboardClientSelectAll');
   }
   function toggleDashboardSelection(id,checked){if(checked)selectedDashboardIds.add(id);else selectedDashboardIds.delete(id);renderDashboardTable();renderDashboardColdCalls();try{renderDashboardSalesOrderTable(dashboardStats());}catch(e){console.warn('Sales selection render failed',e);}updateSelectionCount();}
   function updateSelectionCount(){const e=document.getElementById('dashboardSelectionCount');if(e)e.textContent=String(selectedDashboardIds.size);}
   function clearDashboardSelection(){selectedDashboardIds.clear();renderDashboardTable();renderDashboardColdCalls();try{renderDashboardSalesOrderTable(dashboardStats());}catch(e){}updateSelectionCount();}
+  const DASHBOARD_TAB_BODY={clients:'dashboardHierarchyTable',coldcalls:'dashboardColdCallTable',salesorders:'dashboardSalesOrderTable'};
+  // Reads the selection key directly off the checkboxes actually rendered right now, so
+  // "select all" always matches exactly what the user can see and click - regardless of how
+  // any other tab's selection independently narrows this table's own row list.
+  function dashboardTabVisibleKeys(tab){
+    const bodyId=DASHBOARD_TAB_BODY[tab]; const tbody=bodyId&&document.getElementById(bodyId); if(!tbody) return [];
+    return [...tbody.querySelectorAll('input[data-dash-key]')].map(el=>el.getAttribute('data-dash-key'));
+  }
+  function toggleDashboardSelectAllTab(tab,checked){
+    dashboardTabVisibleKeys(tab).forEach(key=>{ if(checked) selectedDashboardIds.add(key); else selectedDashboardIds.delete(key); });
+    if(tab==='clients') renderDashboardTable();
+    else if(tab==='coldcalls') renderDashboardColdCalls();
+    else { try{ renderDashboardSalesOrderTable(dashboardStats()); }catch(e){} }
+    updateSelectionCount();
+  }
+  function syncDashboardSelectAllHeader(tab,elId){
+    const el=document.getElementById(elId); if(!el) return;
+    const keys=dashboardTabVisibleKeys(tab);
+    const selected=keys.filter(k=>selectedDashboardIds.has(k)).length;
+    el.checked=keys.length>0 && selected===keys.length;
+    el.indeterminate=selected>0 && selected<keys.length;
+  }
   function selectAllDashboardRows(){filteredClients.forEach(c=>selectedDashboardIds.add('CL:'+c.id));(rawData.coldCalls||[]).filter(c=>dashboardDatePasses(c.activityDate||c.entryDate||c.timestamp)&&dashboardUserPasses(c)).forEach(c=>selectedDashboardIds.add('CC:'+c.id));(rawData.salesOrders||[]).filter(o=>dashboardDatePasses(o.date||o.entryDate||o.timestamp)&&dashboardUserPasses(o)).forEach(o=>selectedDashboardIds.add('SO:'+String(o.id||o.orderId||o.ID||'')));renderDashboardTable();renderDashboardColdCalls();try{renderDashboardSalesOrderTable(dashboardStats());}catch(e){}updateSelectionCount();}
+  // Keeps the space reserved under the fixed mobile top bar matching its real (measured)
+  // height, since that bar's content can wrap onto more lines on narrow screens.
+  function syncMobileNavbarHeight(){
+    const bar=document.querySelector('.mobile-navbar');
+    if(bar) document.documentElement.style.setProperty('--kosol-mobile-navbar-h',bar.offsetHeight+'px');
+  }
+  window.addEventListener('resize',syncMobileNavbarHeight);
+  window.addEventListener('orientationchange',()=>setTimeout(syncMobileNavbarHeight,50));
+  window.addEventListener('load',syncMobileNavbarHeight);
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(syncMobileNavbarHeight,0));
+  // The bar's own content changes height after login (name/designation/place get filled in,
+  // sometimes wrapping onto extra lines for a long name) and whenever its text changes later,
+  // so keep watching it directly rather than only reacting to window resizes.
+  try{
+    new ResizeObserver(()=>syncMobileNavbarHeight()).observe(document.querySelector('.mobile-navbar'));
+  }catch(e){}
+
   const SESSION_KEY='KOSOL_ACTIVE_SESSION_V17';
+  let sessionUseLocalStorage=true;
+  function activeSessionStore(){ return sessionUseLocalStorage?localStorage:sessionStorage; }
   let allowPageExit=false;
-  function persistSession(){ if(currentUser && currentUser.authToken) localStorage.setItem(SESSION_KEY,JSON.stringify({user:currentUser,savedAt:Date.now(),persistent:true})); }
-  function clearPersistedSession(){ localStorage.removeItem(SESSION_KEY); }
+  function persistSession(){
+    if(!currentUser || !currentUser.authToken) return;
+    try{localStorage.removeItem(SESSION_KEY);}catch(e){}
+    try{sessionStorage.removeItem(SESSION_KEY);}catch(e){}
+    activeSessionStore().setItem(SESSION_KEY,JSON.stringify({user:currentUser,savedAt:Date.now(),persistent:sessionUseLocalStorage}));
+  }
+  function clearPersistedSession(){ try{localStorage.removeItem(SESSION_KEY);}catch(e){} try{sessionStorage.removeItem(SESSION_KEY);}catch(e){} }
   function showUserSessionPopup(kind,userOverride){
     const u=userOverride||currentUser||{}; const role=getFormattedUserRoleDisplay(u); const place=userNavbarFitment(u).place;
     const name=escapeHtml(u.name||'User'), email=escapeHtml(u.email||''), designation=escapeHtml(role||u.role||''), territory=escapeHtml(place||'');
@@ -4312,7 +4553,12 @@ select.form-select,select.form-control{padding-right:2.35rem!important;backgroun
     document.getElementById('mainApp').classList.add('d-none'); document.getElementById('authScreen').classList.remove('d-none'); toggleAuthView('login'); showUserSessionPopup('goodbye',u);
   }
   function restoreSessionAfterReload(){
-    try{ const raw=localStorage.getItem(SESSION_KEY); if(!raw)return; const saved=JSON.parse(raw); if(!saved||!saved.user)return;
+    try{
+      let raw=null;
+      try{raw=sessionStorage.getItem(SESSION_KEY);}catch(e){}
+      if(raw){ sessionUseLocalStorage=false; }
+      else { try{raw=localStorage.getItem(SESSION_KEY);}catch(e){} sessionUseLocalStorage=true; }
+      if(!raw)return; const saved=JSON.parse(raw); if(!saved||!saved.user)return;
       if(!saved.user.authToken){clearPersistedSession();currentUser=null;document.getElementById('mainApp')?.classList.add('d-none');document.getElementById('authScreen')?.classList.remove('d-none');toggleAuthView('login');showOperationMessage('Secure session unavailable','Your previous session did not contain a valid security token. Please log in again.','error');return;}
       currentUser=saved.user; allowPageExit=false; setupAppShell(); showOperationMessage('Session restored',`Welcome back, ${currentUser.name||currentUser.email}. Your previous session is still active. You may continue working or use Logout when you are finished.`,'success');
       const overlay=document.getElementById('operationOverlay'),body=overlay?.querySelector('.operation-body');
@@ -5473,19 +5719,26 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
       </div>`;}).join('')+(list.length>MAX?`<div class="small text-muted text-center py-2">Showing the first ${MAX} of ${list.length} notifications.</div>`:''):'<div class="text-center text-muted py-4">No actionable notifications.</div>'}</div>`;
   }
 
+  // Opens instantly using whatever is already in memory (kept fresh by the background sync every
+  // 30s), then quietly checks the server and updates the open list in place if anything changed.
+  // This removes the network wait that used to block the panel from opening at all.
   async function openNotifications(){
     notificationBadgeDismissed=true;document.getElementById('notificationBadge')?.classList.add('d-none');
+    refreshNotificationFeed();
+    modal(`<div><div class="dashboard-popup-title"><i class="bi bi-bell-fill me-2"></i>Notifications</div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+        <div class="small text-muted">Follow-ups appear once per client after ${FOLLOWUP_STALE_DAYS} days without activity or sales. Click a notification to mark it read and open its module.</div>
+        <button type="button" id="notifMarkAllBtn" class="btn btn-sm btn-outline-dark" onclick="markAllNotificationsRead()"><i class="bi bi-check2-all me-1"></i>Mark all as read</button>
+      </div><div id="notificationListHost"></div></div>`);
+    renderNotificationListInPlace();
     try{
-      const r=await callBackendFast('getNotifications',{},{fresh:true});if(!r.success)throw Error(r.message||'Unable to load notifications.');
-      rawData.notifications=r.notifications||[];
-      refreshNotificationFeed();
-      modal(`<div><div class="dashboard-popup-title"><i class="bi bi-bell-fill me-2"></i>Notifications</div>
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-          <div class="small text-muted">Follow-ups appear once per client after ${FOLLOWUP_STALE_DAYS} days without activity or sales. Click a notification to mark it read and open its module.</div>
-          <button type="button" id="notifMarkAllBtn" class="btn btn-sm btn-outline-dark" onclick="markAllNotificationsRead()"><i class="bi bi-check2-all me-1"></i>Mark all as read</button>
-        </div><div id="notificationListHost"></div></div>`);
-      renderNotificationListInPlace();
-    }catch(e){notificationBadgeDismissed=false;renderNotificationBadge();showOperationMessage('Notifications failed',e.message,'error');}
+      const r=await callBackendFast('getNotifications',{},{fresh:true});
+      if(r && r.success!==false){
+        rawData.notifications=r.notifications||[];
+        if(document.getElementById('notificationListHost')){ refreshNotificationFeed(); renderNotificationListInPlace(); }
+        else renderNotificationBadge();
+      }
+    }catch(e){ /* panel already shown from cache; a silent background-refresh miss is not worth interrupting the user for */ }
   }
 
   // Marks the given notification ids as read (instantly on screen), then syncs to the backend in the background.
@@ -5641,7 +5894,7 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
   }
   async function buildDashboardPdfFile(){
     const {jsPDF}=window.jspdf;
-    const s={clients:(rawData.clients||[]).slice(),calls:(rawData.coldCalls||[]).slice()};
+    const s={clients:currentDashboardClients(),calls:currentDashboardColdCalls()};
     const doc=new jsPDF({orientation:'landscape',unit:'pt',format:'a3'});
     const PAGE_W=1191.0, PAGE_H=841.9, M=28;
     const user=currentUser||{};
@@ -5812,7 +6065,7 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
     return Object.keys(u).filter(k=>!sensitive.test(k)).map(k=>[k,backendSafeValue(u[k])]);
   }
   async function buildWordFormHtml(){
-    const clients=(rawData.clients||[]).slice(), calls=(rawData.coldCalls||[]).slice();
+    const clients=currentDashboardClients(), calls=currentDashboardColdCalls();
     const esc=v=>escapeHtml(v==null?'':String(v));
     const user=currentUser||{};
     const userRows=rawUserRows();
@@ -5945,7 +6198,7 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
   function buildDashboardPngFile(shot){return new File([dataUrlToBlob(shot.dataUrl)],exportFileStem()+'.png',{type:'image/png'});}
   function dataUrlToBlob(dataUrl){const [meta,data]=String(dataUrl).split(',');const bytes=atob(data);const arr=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)arr[i]=bytes.charCodeAt(i);const mime=(meta.match(/data:([^;]+)/)||[])[1]||'application/octet-stream';return new Blob([arr],{type:mime});}
   async function buildExcelFile(){
-    const clients=(rawData.clients||[]).slice(),calls=(rawData.coldCalls||[]).slice();
+    const clients=currentDashboardClients(),calls=currentDashboardColdCalls();
     const userRows=rawUserRows();
     const clientCols=backendColumns(clients),coldCols=backendColumns(calls);
     if(window.ExcelJS){
@@ -6014,7 +6267,7 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
   async function buildDashboardPptx(){
     try{
       if(!window.PptxGenJS)throw new Error('PowerPoint library could not be loaded.');
-      const s={clients:(rawData.clients||[]).slice(),calls:(rawData.coldCalls||[]).slice()},pptx=new PptxGenJS();pptx.layout='LAYOUT_WIDE';pptx.author='Kosol Energie Pvt Ltd';pptx.company='Kosol Energie Pvt Ltd';pptx.subject='Sales dashboard report';pptx.title=dashboardTitle();pptx.lang='en-US';
+      const s={clients:currentDashboardClients(),calls:currentDashboardColdCalls()},pptx=new PptxGenJS();pptx.layout='LAYOUT_WIDE';pptx.author='Kosol Energie Pvt Ltd';pptx.company='Kosol Energie Pvt Ltd';pptx.subject='Sales dashboard report';pptx.title=dashboardTitle();pptx.lang='en-US';
       const W=13.333,H=7.5;
       const addMeta=(slide,title,sub='')=>{slide.background={color:'F8FAFC'};slide.addText(title,{x:.35,y:.18,w:12.6,h:.38,fontSize:18,bold:true,margin:0,fit:'shrink'});if(sub)slide.addText(sub,{x:.35,y:.58,w:12.6,h:.24,fontSize:8,color:'475569',margin:0,fit:'shrink'});};
       const addVisualSlide=async(title,el,sub)=>{const shot=await capturePptElement(el,3);if(!shot)return;const sl=pptx.addSlide();addMeta(sl,title,sub);pptAddImageContain(sl,shot,.3,.92,12.73,6.25);};
@@ -6550,29 +6803,31 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
   document.addEventListener('keydown',ev=>{const el=ev.target;if(!(el instanceof HTMLSelectElement)||el.disabled||ev.ctrlKey||ev.metaKey||ev.altKey)return;const k=String(ev.key||'');if(k.length!==1)return;const now=Date.now(),st=selectTypeBuffer.get(el)||{text:'',time:0};st.text=(now-st.time<900?st.text:'')+k;st.time=now;selectTypeBuffer.set(el,st);const q=st.text.toLowerCase(),opts=[...el.options].filter(o=>!o.disabled&&String(o.textContent||'').trim()),m=opts.find(o=>String(o.textContent).toLowerCase()===q)||opts.find(o=>String(o.textContent).toLowerCase().startsWith(q))||opts.find(o=>String(o.textContent).toLowerCase().includes(q));if(m){if(el.multiple)m.selected=true;else el.value=m.value;el.dispatchEvent(new Event('change',{bubbles:true}));ev.preventDefault();}},true);
 
 
-  // ---- Dashboard performance layer ----
-  // Reuses in-flight GET requests and short-lived read results to avoid
-  // repeated backend calls while keeping writes and explicit refreshes live.
+  // ---- Dashboard performance / reliability layer ----
+  // The existing GS is the source of truth. Read caching is useful for small lookups,
+  // but dashboard data must not be served from an old response. In-flight de-duplication
+  // is retained so two UI events cannot start duplicate requests for the same read.
   const BACKEND_READ_CACHE = new Map();
   const BACKEND_INFLIGHT = new Map();
-  const BACKEND_READ_TTL = 60000;
+  const BACKEND_READ_TTL = 30000;
 
   function backendReadKey(action,payload){
-    try{return action+'|'+JSON.stringify(payload||{});}
-    catch(e){return action+'|'+String(payload||'');}
+    try{return String(action||'')+'|'+JSON.stringify(payload||{});}
+    catch(e){return String(action||'')+'|'+String(payload||'');}
   }
-
   function isBackendReadAction(action){
     return /^(get|fetch|load|list|search|check|validate|dashboard)/i.test(String(action||''));
   }
-
   let backendCacheGeneration=0;
+
   async function callBackendFast(action,payload={},options={}){
-    const key=backendReadKey(action,payload);
+    const key=backendReadKey(action,payload), isRead=isBackendReadAction(action);
+    const isDashboard=String(action||'')==='getDashboardData';
     const now=Date.now();
-    const isRead=isBackendReadAction(action);
     if(isRead){
-      if(!options.fresh){
+      // Never return an old dashboard response. Other small read endpoints can use
+      // a short cache to avoid duplicate UI lookups.
+      if(!options.fresh && !isDashboard){
         const cached=BACKEND_READ_CACHE.get(key);
         if(cached && now-cached.time<BACKEND_READ_TTL) return cached.value;
       }
@@ -6580,19 +6835,17 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
     }
     const generation=backendCacheGeneration;
     const request=callBackend(action,payload);
-    if(isRead){
-      BACKEND_INFLIGHT.set(key,request);
-      try{
-        const value=await request;
-        // Never cache failures, and never cache a response that was requested before a write
-        // invalidated the cache (it could contain pre-save data).
-        if(generation===backendCacheGeneration && value && value.success!==false) BACKEND_READ_CACHE.set(key,{time:Date.now(),value});
-        return value;
-      }finally{
-        if(BACKEND_INFLIGHT.get(key)===request) BACKEND_INFLIGHT.delete(key);
+    if(!isRead) return request;
+    BACKEND_INFLIGHT.set(key,request);
+    try{
+      const value=await request;
+      if(!isDashboard && generation===backendCacheGeneration && value && value.success!==false){
+        BACKEND_READ_CACHE.set(key,{time:Date.now(),value});
       }
+      return value;
+    }finally{
+      if(BACKEND_INFLIGHT.get(key)===request) BACKEND_INFLIGHT.delete(key);
     }
-    return request;
   }
 
   function invalidateBackendReadCache(){
@@ -6618,7 +6871,7 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
     // Safety net: most handlers already call refreshData(); if none started one, do it here.
     setTimeout(()=>{
       if(currentUser && lastRefreshStartedAt<writeTime) refreshData({silent:true,reason:'after-write',force:true});
-    },1200);
+    },700);
   }
 
   async function callBackend(action,payload){
@@ -6639,7 +6892,7 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
   }
 
   async function callBackendRaw(action, payload) {
-    const requestPayload = (payload && typeof payload === 'object') ? Object.assign({}, payload) : {};
+    const requestPayload=(payload && typeof payload==='object')?Object.assign({},payload):{};
     const ownCrudActions=new Set(['updateClient','deleteClient','updateColdCall','deleteColdCall','updateSalesOrder','deleteSalesOrder']);
     if(ownCrudActions.has(action) && !isMasterAdminUser()){
       const recordId=requestPayload.id||requestPayload.recordId||requestPayload.orderId;
@@ -6647,19 +6900,17 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
       if(action.toLowerCase().includes('coldcall')) record=(rawData.coldCalls||[]).find(x=>String(x.id)===String(recordId));
       else if(action.toLowerCase().includes('client')) record=(rawData.clients||[]).find(x=>String(x.id)===String(recordId));
       else if(action.toLowerCase().includes('salesorder')) record=(rawData.salesOrders||[]).find(x=>String(x.id||x.orderId)===String(recordId));
-      if(!record || !recordOwnerMatchesUser(record)){
-        return {success:false,message:'Access denied. You can modify or delete only records saved by your logged-in account.'};
-      }
+      if(!record || !recordOwnerMatchesUser(record)) return {success:false,message:'Access denied. You can modify or delete only records saved by your logged-in account.'};
       requestPayload.userId=currentUser?.id||requestPayload.userId;
       requestPayload.userEmail=currentUser?.email||requestPayload.userEmail;
       requestPayload.userRole=currentUser?.role||requestPayload.userRole;
       requestPayload.ownerId=record.userId||record.ownerId||record.createdByUserId||'';
       requestPayload.ownerEmail=record.userEmail||record.ownerEmail||record.createdBy||'';
     }
-    if(!['login','selfRegister','health','getReportingManagers','requestPasswordResetOtp','resetPasswordWithOtp'].includes(action)) {
-      if(!currentUser || !currentUser.email || !currentUser.authToken){
+    if(!['login','selfRegister','health','getReportingManagers','requestPasswordResetOtp','resetPasswordWithOtp'].includes(action)){
+      if(!currentUser?.email || !currentUser?.authToken){
         clearPersistedSession(); currentUser=null;
-        return { success:false, message:'Your login session is missing its security token. Please sign in again.' };
+        return {success:false,message:'Your login session is missing its security token. Please sign in again.'};
       }
       requestPayload.email=requestPayload.email||currentUser.email;
       requestPayload.authToken=requestPayload.authToken||currentUser.authToken;
@@ -6668,20 +6919,56 @@ function dashboardIdentityKey(o){const id=String(o?.clientId||o?.clientID||o?.id
       requestPayload.userEmail=requestPayload.userEmail||currentUser.email;
     }
     if(!isValidScriptUrl(SCRIPT_URL)) return {success:false,message:'Invalid backend /exec URL. Open Backend Settings and enter the deployed Web App URL.'};
-    const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),60000);
-    try {
-      const response=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,payload:requestPayload}),signal:controller.signal,cache:'no-store'});
-      const text=await response.text();
-      if(!response.ok) return {success:false,message:`Backend HTTP ${response.status}. Verify Web App deployment access is set to Anyone.`};
-      let result; try{result=JSON.parse(text);}catch(_){return {success:false,message:'Backend returned HTML/non-JSON. This usually means the Apps Script URL is not the deployed /exec URL or the deployment is not accessible.'};}
-      if(!result || typeof result!=='object') return {success:false,message:'Backend returned an empty/invalid response.'};
-      result=cleanNullText(result);
-      if(result.success===false && /session expired|authentication required|unauthorized user/i.test(String(result.message||''))){clearPersistedSession();currentUser=null;}
-      return result;
-    } catch(err) {
-      const msg=err?.name==='AbortError'?'Backend request timed out after 60 seconds.':'Unable to reach the backend. Check the Web App deployment URL, access setting, and internet connection.';
-      console.error('Backend request failed:',action,err); return {success:false,message:msg};
-    } finally { clearTimeout(timer); }
+
+    const canRetry=/^(get|fetch|load|list|search|check|validate|dashboard|health)/i.test(String(action||''));
+    // Do not retry writes. Reads may retry transient network/Apps Script cold-start failures.
+    const maxAttempts=canRetry?3:1;
+    let lastError=null;
+    for(let attempt=1;attempt<=maxAttempts;attempt++){
+      const controller=new AbortController();
+      // Apps Script may cold-start and read large Sheets. Give it enough time to finish,
+      // but still fail cleanly instead of hanging forever.
+      const timeoutMs=canRetry?(attempt===1?120000:150000):90000;
+      const timer=setTimeout(()=>controller.abort(),timeoutMs);
+      try{
+        const response=await fetch(SCRIPT_URL,{
+          method:'POST',
+          mode:'cors',
+          credentials:'omit',
+          redirect:'follow',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body:JSON.stringify({action,payload:requestPayload}),
+          signal:controller.signal,
+          cache:'no-store'
+        });
+        const text=await response.text();
+        if(!response.ok){
+          if(canRetry && attempt<maxAttempts && [408,425,429,500,502,503,504].includes(response.status)){
+            await new Promise(r=>setTimeout(r,900*attempt)); continue;
+          }
+          return {success:false,message:`Backend HTTP ${response.status}. Verify that the existing Apps Script Web App deployment is active and accessible to anyone with the link.`};
+        }
+        let result;
+        try{result=JSON.parse(text);}catch(_){
+          const sample=String(text||'').replace(/\s+/g,' ').slice(0,220);
+          if(canRetry && attempt<maxAttempts){await new Promise(r=>setTimeout(r,900*attempt));continue;}
+          return {success:false,message:'The existing backend returned a non-JSON response. The browser reached the URL, but the deployed /exec endpoint did not return the expected API response.'+(sample?' Response starts with: '+sample:'')};
+        }
+        if(!result || typeof result!=='object') return {success:false,message:'The existing backend returned an empty/invalid response.'};
+        result=cleanNullText(result);
+        if(result.success===false && /session expired|authentication required|unauthorized user/i.test(String(result.message||''))){clearPersistedSession();currentUser=null;}
+        return result;
+      }catch(err){
+        lastError=err;
+        if(canRetry && attempt<maxAttempts){await new Promise(r=>setTimeout(r,1000*attempt));continue;}
+        const msg=err?.name==='AbortError'
+          ? `Backend request timed out after ${Math.round(timeoutMs/1000)} seconds. The existing Google Apps Script is taking too long to return the requested data.`
+          : 'Unable to reach the existing Google Apps Script backend. If this HTML is opened directly as file://, open it from an HTTPS web host; browsers can block cross-origin requests from local files.';
+        console.error('Backend request failed:',action,err);
+        return {success:false,message:msg};
+      }finally{clearTimeout(timer);}
+    }
+    return {success:false,message:lastError?.message||'Unable to load data from the existing backend.'};
   }
 
   async function testBackendConnection(show=true){
@@ -6804,7 +7091,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     populateSelect('ccState',INDIA_STATES,'-- Select State --');
     ['c','cc','su'].forEach(prefix=>populateRegionForStates(prefix,[]));
     initAllSmartMultiSelects();
-    const savedSession=localStorage.getItem(SESSION_KEY);
+    let savedSession=null; try{savedSession=sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY);}catch(e){}
     if(!savedSession) setTimeout(()=>showKosolWelcome(),80);
     restoreSessionAfterReload();
     ['suPhone','cOfficeMobile','ccOfficePhone','editUserPhone'].forEach(id=>{const e=document.getElementById(id);if(e&&e.type!=='tel')e.setAttribute('inputmode','tel');});
@@ -7388,6 +7675,430 @@ const oldSwitchTab=window.switchTab;window.switchTab=async function(tabId,event)
     }).observe(document.body,{childList:true,subtree:true,characterData:true});
   }
   if(document.body) start(); else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
+
+<style id="kosol-dashboard-fast-dropdown-fix">
+/* Keep every searchable multi-select menu physically attached to its field.
+   The existing functionality remains unchanged; this only corrects positioning
+   and makes the option list easier to use on touch screens. */
+.smart-multi{position:relative!important;z-index:20!important;min-width:0;}
+.smart-multi-menu{position:absolute!important;left:0!important;right:0!important;top:calc(100% + 3px)!important;z-index:12050!important;width:auto!important;max-width:100%!important;}
+.smart-multi-options{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+#dashboardUserFilters{position:relative;z-index:30;}
+#dashboardUserFilters>select{min-width:210px;max-width:100%;}
+@media(max-width:767.98px){
+  .smart-multi-menu{position:absolute!important;left:0!important;right:0!important;top:calc(100% + 3px)!important;max-height:min(70vh,420px)!important;}
+  #dashboardUserFilters>select{width:100%;min-width:0;}
+}
+</style>
+<script id="kosol-dashboard-fast-filter-fix">
+(function(){
+  'use strict';
+
+  /* ------------------------------------------------------------
+     Dashboard filter context cache
+     Prevents rebuilding the complete reporting hierarchy for
+     every single client/call/order record.
+     ------------------------------------------------------------ */
+  let _dashFilterContextKey='';
+  let _dashFilterContext=null;
+
+  function dashIds(u){
+    return new Set([
+      u?.id,u?.userId,u?.employeeId,u?.email,u?.name,u?.loginId,u?.username
+    ].filter(v=>v!==undefined&&v!==null&&String(v).trim()!=='').map(v=>dashboardNorm(v)));
+  }
+  function dashSame(a,b){
+    const aa=dashIds(a),bb=dashIds(b);
+    for(const x of aa) if(bb.has(x)) return true;
+    return false;
+  }
+  function dashUserValue(u){
+    return String(u?.id||u?.userId||u?.employeeId||u?.email||u?.name||u?.loginId||u?.username||'');
+  }
+  function dashIsHead(){
+    const r=String(currentUser?.role||'');
+    return r==='Master Admin'||r==='Admin'||/head/i.test(r);
+  }
+  function getDashboardFilterContext(){
+    const uf=document.getElementById('dashboardUserFilter')?.value||'ALL';
+    const sf=document.getElementById('dashboardStateFilter')?.value||'ALL';
+    const key=[lastDataFingerprint,lastTeamSignature,dashUserValue(currentUser),uf,sf,Array.isArray(allUsersList)?allUsersList.length:0].join('|');
+    if(_dashFilterContext && _dashFilterContextKey===key) return _dashFilterContext;
+
+    // Always prefer the complete user directory when it is available. A
+    // reporting manager's team must not disappear simply because a member has
+    // no record in today's dashboard snapshot.
+    const users=(Array.isArray(allUsersList)&&allUsersList.length)
+      ? allUsersList
+      : dashboardEligibleUsers();
+    const isHead=dashIsHead();
+    const team=isHead ? dashboardHeadTeam(currentUser,users) : dashboardTeamMembers(currentUser,users);
+    const selectable=[currentUser,...team.filter(u=>!dashSame(u,currentUser))];
+    const selected=(uf==='ALL'||uf==='TEAM:ALL')
+      ? null
+      : selectable.find(u=>dashUserValue(u)===String(uf))||null;
+
+    _dashFilterContextKey=key;
+    _dashFilterContext={uf,sf,users,team,selectable,selected,isHead,hasTeam:team.length>0};
+    return _dashFilterContext;
+  }
+
+  /* Explicitly invalidate the lightweight cache whenever the application
+     receives a new backend snapshot or the user hierarchy changes. */
+  const _oldApplyDashboardFilters=window.applyDashboardFilters;
+  window.invalidateDashboardFilterContext=function(){
+    _dashFilterContextKey='';
+    _dashFilterContext=null;
+  };
+
+  /* Fast dashboard user filtering. For a reporting manager, both "All" and
+     "All Team User Data" mean the manager's complete direct+indirect team.
+     Master/Admin retains its unrestricted "All" behavior. */
+  window.dashboardUserPasses=function(item){
+    const c=getDashboardFilterContext();
+    const sf=c.sf;
+
+    if(sf!=='ALL'){
+      if(!dashboardFieldAllows(currentUser,'states',sf)) return false;
+      const itemState=item?.state??item?.State;
+      if(itemState!==undefined&&!dashboardFieldAllows({states:[sf]},itemState)) return false;
+    }
+
+    // "All" for a reporting manager means MY DATA + every direct/indirect
+    // team member. TEAM:ALL is the explicit equivalent shown in the dropdown.
+    // Master Admin/Admin retain unrestricted All behavior.
+    if(c.uf==='ALL'||c.uf==='TEAM:ALL'){
+      if(currentUser?.role==='Master Admin'||currentUser?.role==='Admin') return true;
+      if(c.hasTeam) return dashboardOwnerMatches(item,currentUser) ||
+        c.team.some(u=>dashboardOwnerMatches(item,u));
+      return dashboardOwnerMatches(item,currentUser);
+    }
+
+    // A selected name is always an exact owner selection.
+    return !!c.selected && dashboardOwnerMatches(item,c.selected);
+  };
+
+
+  /* Target ownership is intentionally checked by user identity fields, not
+     by target-name text. This lets a manager inspect a subordinate's target
+     by selecting that subordinate's username. */
+  function dashboardTargetOwnerMatches(target,user){
+    if(!target||!user) return false;
+    const ownerVals=[
+      target.userId,target.userID,target.userEmail,target.email,
+      target.employeeId,target.employeeID,target.username,target.userName,
+      target.createdBy,target.createdByEmail,target.createdById,
+      target.ownerId,target.ownerEmail,target.ownerName
+    ].filter(v=>v!==undefined&&v!==null&&String(v).trim()!=='').map(dashboardNorm);
+    const userVals=[
+      user.id,user.userId,user.employeeId,user.email,user.name,
+      user.loginId,user.username
+    ].filter(v=>v!==undefined&&v!==null&&String(v).trim()!=='').map(dashboardNorm);
+    return userVals.some(v=>ownerVals.includes(v));
+  }
+
+  function dashboardTargetMatchesScope(target,c){
+    if(!target||!c) return false;
+    if(c.uf==='ALL'||c.uf==='TEAM:ALL'){
+      if(currentUser?.role==='Master Admin'||currentUser?.role==='Admin') return true;
+      if(c.hasTeam){
+        return dashboardTargetOwnerMatches(target,currentUser) ||
+               c.team.some(u=>dashboardTargetOwnerMatches(target,u));
+      }
+      return dashboardTargetOwnerMatches(target,currentUser);
+    }
+    return !!c.selected && dashboardTargetOwnerMatches(target,c.selected);
+  }
+
+  function dashboardTargetOrders(target,orders){
+    if(target?.achieved!==undefined&&target?.achieved!==null) return [];
+    const start=appDateNumber(target?.startDate), end=appDateNumber(target?.endDate||target?.startDate);
+    const base=(orders||[]).filter(o=>{
+      const d=appDateNumber(o?.date||o?.entryDate);
+      return Number.isFinite(d)&&d>=start&&d<=end;
+    });
+    const ownerKeys=[
+      target?.userId,target?.userID,target?.userEmail,target?.email,
+      target?.employeeId,target?.employeeID,target?.username,target?.userName
+    ].filter(v=>v!==undefined&&v!==null&&String(v).trim()!=='').map(dashboardNorm);
+    if(!ownerKeys.length) return base;
+    const owned=base.filter(o=>{
+      const vals=[
+        o?.userId,o?.userID,o?.userEmail,o?.email,o?.employeeId,o?.employeeID,
+        o?.username,o?.userName,o?.createdBy,o?.createdByEmail,o?.ownerId,o?.ownerEmail
+      ].filter(v=>v!==undefined&&v!==null&&String(v).trim()!=='').map(dashboardNorm);
+      return vals.some(v=>ownerKeys.includes(v));
+    });
+    /* Older Sales Order records may not carry an owner field. In that case,
+       retain the existing achievement calculation rather than turning it into
+       zero solely because the legacy row has no ownership metadata. */
+    return owned.length?owned:base;
+  }
+
+  /* Dashboard target summary: obey the same selected username/team scope as
+     clients, calls and sales orders, while preserving the existing layout. */
+  window.renderDashboardTargetSummary=function(){
+    const box=document.getElementById('dashboardTargetSummary');
+    if(!box)return;
+    const c=getDashboardFilterContext();
+    const allTargets=Array.isArray(rawData.targets)?rawData.targets:[];
+    const targets=allTargets.filter(t=>dashboardTargetMatchesScope(t,c));
+    if(!targets.length){
+      box.innerHTML='<div class="text-muted small">No targets found for the selected user/team and dashboard date scope.</div>';
+      return;
+    }
+
+    const orders=Array.isArray(rawData.salesOrders)?rawData.salesOrders:[];
+    const shown=targets.slice(0,20);
+    const scopeLabel=c.uf==='TEAM:ALL'?'All Team User Data':(c.uf==='ALL'?(c.hasTeam?'My Data + My Team':'My Data'):(c.selected?.name||c.selected?.email||'Selected User'));
+    box.innerHTML=shown.map(t=>{
+      const scopedOrders=dashboardTargetOrders(t,orders);
+      const ach=(t.achieved!==undefined&&t.achieved!==null)
+        ? salesOrderNum(t.achieved)
+        : targetAchievementLocal(t,scopedOrders);
+      const tar=salesOrderNum(t.targetValue||t.target||0);
+      const pct=tar?Math.min(100,ach/tar*100):0;
+      const owner=t.userName||t.username||t.userEmail||t.email||t.ownerName||'';
+      return `<div class="mb-3">
+        <div class="d-flex justify-content-between gap-2 flex-wrap">
+          <div>
+            <b>${escapeHtml(t.targetName||'Target')}</b>
+            ${owner?`<small class="d-block text-primary fw-semibold"><i class="bi bi-person"></i> ${escapeHtml(owner)}</small>`:''}
+            <small class="d-block text-muted">${escapeHtml(t.product||'')} · ${escapeHtml(t.metric||'Amount')} · ${escapeHtml(t.pvType||'')} · ${escapeHtml(t.salesType||'All')} · ${escapeHtml(targetPeriodLabel(t))}</small>
+          </div>
+          <div class="fw-bold">${ach.toLocaleString('en-IN',{maximumFractionDigits:2})} / ${tar.toLocaleString('en-IN',{maximumFractionDigits:2})} (${pct.toFixed(1)}%)</div>
+        </div>
+        <div class="progress mt-1" style="height:9px"><div class="progress-bar bg-warning" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+    box.insertAdjacentHTML('afterbegin',`<div class="small text-muted mb-2"><i class="bi bi-people me-1"></i>Target scope: <b>${escapeHtml(scopeLabel)}</b></div>`);
+    if(targets.length>shown.length){
+      box.insertAdjacentHTML('beforeend',`<div class="small text-muted text-center">Showing ${shown.length} of ${targets.length} matching target records.</div>`);
+    }
+  };
+
+  /* Fast filter application: never rebuild the dropdowns when only a filter
+     value changed. The already-loaded backend snapshot is filtered in memory. */
+  window.applyDashboardFilters=function(){
+    const filterType=document.getElementById('dateFilterType')?.value||'ALL';
+    const startCustom=document.getElementById('startDateFilter')?.value||'';
+    const endCustom=document.getElementById('endDateFilter')?.value||'';
+
+    /* Make sure the controls exist once, but never rebuild them on each click. */
+    if(!document.getElementById('dashboardUserFilter') && typeof renderDashboardUserFilters==='function'){
+      try{renderDashboardUserFilters();}catch(e){console.warn('Dashboard user filter init failed:',e);}
+    }
+
+    const datePass=d=>{
+      if(!d)return true;
+      const key=appDateOnly(d),today=appToday();
+      if(!key)return false;
+      if(filterType==='DAILY')return key===today;
+      const n=appDateNumber(key),nowN=appDateNumber(today);
+      if(filterType==='WEEKLY'){
+        const day=new Date(nowN).getUTCDay(),st=nowN-day*86400000;
+        return n>=st&&n<=nowN;
+      }
+      if(filterType==='MONTHLY')return key.slice(0,7)===today.slice(0,7);
+      if(filterType==='CUSTOM'){
+        if(!startCustom||!endCustom)return true;
+        return n>=appDateNumber(startCustom)&&n<=appDateNumber(endCustom);
+      }
+      return true;
+    };
+
+    filteredClients=(rawData.clients||[]).filter(item=>datePass(item.activityDate||item.entryDate)&&dashboardUserPasses(item));
+
+    try{renderDashboardCharts();}catch(e){console.error('Dashboard chart/KPI render failed:',e);}
+    try{renderDashboardTable();}catch(e){console.error('Dashboard table render failed:',e);}
+    try{renderDashboardColdCalls();}catch(e){console.error('Dashboard cold-call render failed:',e);}
+    try{renderDashboardSalesOrderTable(dashboardStats());}catch(e){console.error('Dashboard sales-order render failed:',e);}
+    try{renderDashboardTargetSummary();}catch(e){console.error('Dashboard target summary render failed:',e);}
+  };
+
+  /* The light path is now the same fast in-memory path. */
+  window.applyDashboardFiltersLight=function(){ window.applyDashboardFilters(); };
+
+  /* Keep existing directory loading, but invalidate only the tiny filter cache
+     when the hierarchy changes; no extra backend request is introduced. */
+  const _oldEnsureDashboardUserDirectory=window.ensureDashboardUserDirectory;
+  if(typeof _oldEnsureDashboardUserDirectory==='function'){
+    window.ensureDashboardUserDirectory=async function(){
+      const result=await _oldEnsureDashboardUserDirectory.apply(this,arguments);
+      _dashFilterContextKey='';
+      _dashFilterContext=null;
+      return result;
+    };
+  }
+
+  /* "All" on every existing searchable multi-select means select all available
+     options. Clearing/unchecking one option automatically clears the All state. */
+  function installSmartMultiAll(){
+    document.querySelectorAll('select[multiple]').forEach(function(sel){
+      if(sel.dataset.kosolAllBound==='1')return;
+      const allOpt=[...sel.options].find(o=>{
+        const v=dashboardNorm(o.value),t=dashboardNorm(o.textContent);
+        return v==='all'||t==='all'||v==='all states'||v==='all regions'||v==='all districts'||v==='all tehsils'||v==='all cities'||t==='all states'||t==='all regions'||t==='all districts'||t==='all tehsils'||t==='all cities';
+      });
+      if(!allOpt)return;
+      sel.dataset.kosolAllBound='1';
+      sel.addEventListener('change',function(){
+        if(allOpt.selected){
+          [...sel.options].forEach(o=>{if(o!==allOpt&&o.value)o.selected=true;});
+        }else{
+          /* If any real option is removed, All is no longer semantically selected. */
+          const real=[...sel.options].filter(o=>o!==allOpt&&o.value);
+          if(real.some(o=>!o.selected))allOpt.selected=false;
+        }
+      });
+    });
+  }
+
+  function initFastDashboardFix(){
+    try{installSmartMultiAll();}catch(e){}
+    try{_dashFilterContextKey='';_dashFilterContext=null;}catch(e){}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initFastDashboardFix);
+  else initFastDashboardFix();
+
+  new MutationObserver(function(){
+    try{installSmartMultiAll();}catch(e){}
+  }).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
+<script id="kosol-data-loader-v3-hook">
+setInterval(()=>{
+  const state=document.getElementById('dashboardSyncState');
+  const bar=document.getElementById('kosolDataRetryBar');
+  if(!state||!bar)return;
+  if(!window.__kosolRetryBarDismissed)bar.classList.toggle('show',String(state.className||'').includes(' error'));
+},1000);
+</script>
+<style id="kosol-data-loader-v4-style">
+#kosol-live-loader-v4{position:fixed;right:14px;bottom:14px;z-index:11999;display:none;width:min(92vw,440px);background:#fff;border:1px solid #dee2e6;border-left:4px solid #fc9403;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.14);padding:10px 12px;font-size:.78rem}
+#kosol-live-loader-v4.show{display:block}
+#kosol-live-loader-v4 .small{color:#64748b}
+#kosol-live-loader-v4 .kosol-live-head{display:flex;align-items:center;gap:8px}
+#kosol-live-loader-v4 .kosol-live-close{margin-left:auto;width:30px;height:30px;border:0;background:transparent;color:#64748b;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;padding:0}
+#kosol-live-loader-v4 .kosol-live-close:hover{background:#f1f5f9;color:#0f172a}
+#kosol-live-loader-v4 .kosol-sync-spinner{width:17px;height:17px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;display:inline-block;animation:kosolSyncSpin .72s linear infinite;flex:0 0 auto}
+#kosol-live-loader-v4 .kosol-sync-spinner.done{display:none}
+@keyframes kosolSyncSpin{to{transform:rotate(360deg)}}
+</style>
+<script id="kosol-data-loader-v4">
+(function(){
+  'use strict';
+  const V4={active:false,attempt:0,lastError:'',started:0,lastSuccess:0};
+  window.__kosolDataLoaderV4=V4;
+  function ensureBox(){
+    let b=document.getElementById('kosol-live-loader-v4');
+    if(!b){b=document.createElement('div');b.id='kosol-live-loader-v4';document.body.appendChild(b);}
+    return b;
+  }
+  function status(msg,show){const b=ensureBox();b.innerHTML='<div class="kosol-live-head"><span class="kosol-sync-spinner'+(show?'':' done')+'" aria-hidden="true"></span><b><i class="bi bi-database me-1"></i>Database</b><button type="button" class="kosol-live-close" aria-label="Close" title="Close" onclick="closeLiveDataMessage()"><i class="bi bi-x-lg"></i></button></div><div class="small mt-1">'+esc(msg||'')+'</div>';b.classList.toggle('show',!!show);}
+  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function requiredArrays(p){return ['clients','coldCalls','tasks','approvals','salesOrders','targets','notifications','teamUsers'].filter(k=>!Array.isArray(p?.[k]));}
+  window.closeLiveDataMessage=function(){const b=document.getElementById('kosol-live-loader-v4');if(b)b.classList.remove('show');};
+  window.closeDataRetryMessage=function(){window.__kosolRetryBarDismissed=true;const b=document.getElementById('kosolDataRetryBar');if(b)b.classList.remove('show');};
+  async function directDashboardFetch(payload){
+    const attempts=2;
+    let last=null;
+    for(let n=1;n<=attempts;n++){
+      V4.attempt=n; V4.started=Date.now();
+      status(n===1?'Synchronizing latest database data…':'Retrying database synchronization…',true);
+      const ctl=new AbortController();
+      const timeout=setTimeout(()=>ctl.abort(),180000);
+      try{
+        const response=await fetch(SCRIPT_URL,{method:'POST',mode:'cors',credentials:'omit',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'getDashboardData',payload}),signal:ctl.signal,cache:'no-store'});
+        const text=await response.text();
+        const elapsed=Date.now()-V4.started;
+        window.__kosolLastBackendDiagnostics={status:response.status,ok:response.ok,elapsedMs:elapsed,bytes:text.length,attempt:n,contentType:response.headers.get('content-type')||'',url:SCRIPT_URL};
+        if(!response.ok){last=new Error('Backend HTTP '+response.status+' after '+Math.round(elapsed/1000)+'s');if([408,425,429,500,502,503,504].includes(response.status)&&n<attempts){await new Promise(r=>setTimeout(r,1200));continue;}throw last;}
+        let result;try{result=JSON.parse(text);}catch(e){throw new Error('Backend returned non-JSON after '+Math.round(elapsed/1000)+'s. Response begins: '+String(text).replace(/\s+/g,' ').slice(0,180));}
+        if(!result||typeof result!=='object')throw new Error('Backend returned an invalid response.');
+        if(result.success===false)throw new Error(result.message||'The existing backend rejected the dashboard request.');
+        const p=result.data&&typeof result.data==='object'?result.data:result;
+        const missing=requiredArrays(p);
+        if(missing.length){
+          // A successful dashboard response must contain the datasets expected by the existing UI.
+          // Do not silently display a partially populated dashboard.
+          throw new Error('Dashboard response is incomplete. Missing: '+missing.join(', ')+'.');
+        }
+        V4.lastSuccess=Date.now();V4.lastError='';
+        status('Database synchronized in '+Math.round(elapsed/1000)+'s.',false);
+        setTimeout(()=>status('',false),1200);
+        return result;
+      }catch(e){
+        last=e;V4.lastError=e?.message||String(e);
+        const elapsed=Date.now()-V4.started;
+        window.__kosolLastBackendDiagnostics=Object.assign({},window.__kosolLastBackendDiagnostics||{},{elapsedMs:elapsed,attempt:n,error:V4.lastError});
+        if(n<attempts){await new Promise(r=>setTimeout(r,1200));continue;}
+      }finally{clearTimeout(timeout);}
+    }
+    throw last||new Error('Unable to load live dashboard data.');
+  }
+  window.__kosolDirectDashboardFetch=directDashboardFetch;
+
+  // Replace only the dashboard refresh function. All existing GS actions and all other
+  // application functions remain untouched. The existing GS file is NOT changed.
+  const originalRefreshData=window.refreshData;
+  window.__kosolOriginalRefreshDataV4=originalRefreshData;
+  window.refreshData=async function(options={}){
+    if(typeof currentUser==='undefined' || !currentUser)return false;
+    // currentUser is a top-level lexical variable in the application; do not read it from window.
+    const background=new Set(['auto-poll','tab-visible','pageshow','cross-tab','online','focus']).has(options.reason);
+    if(window.__kosolV4RefreshInFlight){
+      if(background)return false;
+      return window.__kosolV4RefreshInFlight;
+    }
+    const run=(async()=>{
+      const silent=options.silent!==false;
+      try{
+        const u=currentUser;
+        if(!u?.email||!u?.authToken)throw new Error('Your secure login session is missing. Please sign in again.');
+        const payload={email:u.email,authToken:u.authToken,userId:u.id||u.userId||'',userEmail:u.email,userRole:u.role||''};
+        const res=await directDashboardFetch(payload);
+        const p=res.data&&typeof res.data==='object'?res.data:res;
+        // Atomically update every dashboard dataset. This is deliberately explicit so a
+        // malformed/partial backend response can never wipe the browser state with blanks.
+        rawData.clients=p.clients;rawData.coldCalls=p.coldCalls;rawData.tasks=p.tasks;rawData.approvals=p.approvals;
+        rawData.salesOrders=p.salesOrders;rawData.targets=p.targets;rawData.notifications=p.notifications;rawData.teamUsers=p.teamUsers;
+        if(Object.prototype.hasOwnProperty.call(p,'todayAttendance'))rawData.todayAttendance=p.todayAttendance||null;
+        allUsersList=rawData.teamUsers.slice();
+        try{cleanNullText(rawData);}catch(_){}
+        lastDataFingerprint=fastDashboardFingerprint(rawData);
+        dashboardStatsCacheKey='';dashboardStatsCacheValue=null;
+        salesOrderRepeatMapCacheKey='';salesOrderRepeatMapCache=new Map();
+        lastSuccessfulDataRefresh=Date.now();pollFailureCount=0;pollUnchangedCount=0;
+        try{refreshReportingManagerSelectors();}catch(_){}
+        try{syncNotificationBadgeAfterRefresh();}catch(_){}
+        evaluateAttendanceWindowState();
+        applyDashboardFilters();
+        if(activeTabId==='clients')renderClients();
+        else if(activeTabId==='tasks')renderTasks();
+        else if(activeTabId==='approvals')renderApprovals();
+        else if(activeTabId==='coldcalls')renderColdCalls();
+        else if(activeTabId==='salesorders')renderSalesOrders();
+        else if(activeTabId==='targets')renderTargetModule();
+        else if(activeTabId==='pipelineleads'||activeTabId==='pipelineorders')renderPipelineBoards();
+        window.__kosolRetryBarDismissed=true; showDataSyncStatus('synced','Database data synchronized successfully.');
+        updateLiveSyncIndicator?.();
+        try{scheduleFastSnapshotSave();}catch(_){}
+        return true;
+      }catch(e){
+        console.error('KOSOL V4 live data load failed:',e);
+        window.__kosolRetryBarDismissed=false; showDataSyncStatus('error',e?.message||String(e));
+        if(!silent||options.reason==='initial-load')showOperationMessage('Live data could not be loaded',e?.message||String(e),'error');
+        return false;
+      }
+    })();
+    window.__kosolV4RefreshInFlight=run;
+    try{return await run;}finally{window.__kosolV4RefreshInFlight=null;}
+  };
+  window.retryCurrentDataLoad=()=>window.refreshData({silent:false,reason:'manual-retry',force:true});
 })();
 </script>
 </body>
